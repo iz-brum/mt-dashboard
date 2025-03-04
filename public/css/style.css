@@ -1,0 +1,492 @@
+/**
+ * @file public/css/style.css
+ * @description Folha de estilo principal para a aplicação de mapa.
+ *
+ * Este arquivo contém:
+ * - Estilos básicos para a página e layout geral.
+ * - Estilos para o header, incluindo o logo e título.
+ * - Estilos para o mapa e seus containers.
+ * - Estilos para exibição de gráficos e valores.
+ * - Estilos para modais, controles e botões.
+ * - Estilos temporários e ajustes específicos.
+ */
+
+/* ========================================================================== */
+/* 🌍 LAYOUT GERAL */
+/* ========================================================================== */
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================================================================
+   📌 HEADER (TOPO DA PÁGINA)
+   ========================================================================== */
+
+/* Cabeçalho */
+header {
+    display: flex;
+    align-items: center;
+    padding: 5px 20px;
+    height: 60px;
+    background-color: #2f4f4f;
+}
+
+/* Logo e título */
+#cornerLogo {
+    height: 50px;
+    margin-left: -8px;
+    filter: drop-shadow(0 0 1px #fff);
+}
+
+#pageTitle {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #fff;
+    margin: 0 auto;
+}
+
+/* ========================================================================== */
+/* 📌 CONTEÚDO PRINCIPAL */
+/* ========================================================================== */
+
+main#mainContent {
+    display: flex;
+    height: calc(50% - 25px);
+    /* Altura total menos o cabeçalho */
+}
+
+/* MAPA - Ocupa a maior parte da tela */
+#map {
+    flex: 2;
+    height: 100%;
+    position: relative;
+}
+
+/* ==========================================================================
+   📊 GRÁFICOS E VALORES
+   ========================================================================== */
+
+#chartContainer {
+    width: 100%;
+    height: 45%;
+    background-color: #f5f5f5;
+    padding: 5px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#chartContainer canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ==========================================================================
+   🔳 QUADRADOS LATERAIS INTELIGENTES
+   ========================================================================== */
+#squareBlocks {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    height: calc(60vh - 115px);
+    overflow-y: auto;
+    padding: 2px;
+    width: 470px;
+    z-index: 430;
+}
+
+.square {
+    min-height: 50px;
+    background: linear-gradient(145deg, #3a5f5f, #2f4f4f);
+    border-radius: 8px;
+    padding: 15px;
+    color: white;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.square:hover {
+    transform: scale(1.015); /* 🔹 Aumenta o tamanho em 5% */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.15s ease-in-out; /* 🔹 Suaviza o efeito */
+}
+
+.square h3 {
+    font-size: 15px;
+    margin: 0;
+    line-height: 1.1;
+    color: #d3f9d8;
+}
+
+.square p {
+    font-size: 20px;
+    margin: 5px 0 0 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Remove o cursor pointer de todos os quadrados por padrão */
+.info-box.square {
+    cursor: default;
+}
+
+/* Aplica cursor pointer apenas nos botões interativos */
+.info-box.square[data-tipo] {
+    cursor: pointer;
+}
+
+
+/* ==========================================================================
+   🎨 DETALHES VISUAIS
+   ========================================================================== */
+#maiorRegistro {
+    grid-column: 1 / -1;
+    background: linear-gradient(145deg, #4a2f2f, #5f3a3a);
+    min-height: 50px;
+}
+
+#maiorRegistro h3 {
+    font-size: 18px;
+}
+
+#maiorRegistro p {
+    font-size: 20px;
+    color: #ffd700;
+}
+
+/* Scrollbar customizada */
+#squareBlocks::-webkit-scrollbar {
+    width: 6px;
+}
+
+#squareBlocks::-webkit-scrollbar-thumb {
+    background: #2f4f4f;
+    border-radius: 4px;
+}
+
+#maiorRegistro:hover {
+    transform: scale(0.99, 0.98); /* 🔹 Reduz menos na largura (X) e mais na altura (Y) */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.15s ease-in-out;
+}
+
+/* ==========================================================================
+   📋 MODAL (DETALHES) - MODERNO & INTERATIVO
+   ========================================================================== */
+
+   #modalDetalhes {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border-radius: 16px;
+    z-index: 1000;
+    width: 85%;
+    max-width: 900px;
+    max-height: 80vh;
+    overflow: visible;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+#modalDetalhesContent {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: #2c3e50;
+    line-height: 1.6;
+}
+
+/* Header do Modal */
+#modalDetalhesContent h3 {
+    font-size: 26px;
+    margin: 0 0 25px 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #3498db;
+    text-align: center;
+    color: #2c3e50;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Container para listas longas */
+.modal-lista-container {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding-right: 12px;
+    margin: 15px -10px;
+}
+
+/* Barra de rolagem estilizada */
+.modal-lista-container::-webkit-scrollbar {
+    width: 8px;
+    background-color: rgba(245, 245, 245, 0.9);
+    border-radius: 4px;
+}
+
+.modal-lista-container::-webkit-scrollbar-thumb {
+    background-color: #3498db;
+    border-radius: 4px;
+}
+
+/* Lista Moderna */
+.modal-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    padding: 15px 0;
+}
+
+.modal-lista li {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.modal-lista li:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+}
+
+.modal-lista li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: #3498db;
+    transition: width 0.3s ease;
+}
+
+.modal-lista li:hover::before {
+    width: 100%;
+    opacity: 0.1;
+}
+
+#modalDetalhes canvas {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 25px 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Container principal para conteúdo rolável */
+.modal-content-container {
+    max-height: 65vh;
+    overflow-y: auto;
+    padding: 0 15px 15px 0;
+    margin: 0 -10px;
+}
+
+/* Barra de rolagem estilizada para todo o conteúdo */
+.modal-content-container::-webkit-scrollbar {
+    width: 8px;
+    background-color: rgba(245, 245, 245, 0.9);
+}
+
+.modal-content-container::-webkit-scrollbar-thumb {
+    background-color: #3498db;
+    border-radius: 4px;
+}
+
+/* Ajustes para gráficos dentro do container rolável */
+.modal-content-container canvas {
+    margin: 20px 0;
+    min-height: 300px; /* Altura mínima para gráficos */
+}
+
+/* Ajustes nas cores dos elementos do gráfico */
+.chart-grid-line {
+    color: rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+.chart-axis-label {
+    color: #7f8c8d !important;
+    font-weight: 500;
+}
+
+/* Fórmulas Matemáticas Estilizadas */
+.mathjax-formula {
+    background: #34495e;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 15px 0;
+    color: #ecf0f1;
+    font-size: 1.1em;
+}
+
+/* Botão de Fechar Moderno */
+#modalDetalhesClose {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    color: #e74c3c;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#modalDetalhesClose:hover {
+    transform: rotate(90deg) scale(1.1);
+    color: #c0392b;
+    background: rgba(255, 255, 255, 1);
+}
+
+/* Tipografia Melhorada */
+#modalDetalhesContent p {
+    font-size: 16px;
+    color: #7f8c8d;
+    margin: 15px 0;
+    line-height: 1.8;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    #modalDetalhes {
+        width: 95%;
+        padding: 20px;
+    }
+    
+    .modal-lista-container {
+        max-height: 60vh;
+    }
+    
+    .modal-lista {
+        grid-template-columns: 1fr;
+    }
+    
+    #modalDetalhesContent h3 {
+        font-size: 22px;
+    }
+}
+
+/* Animações */
+@keyframes slideIn {
+    from { opacity: 0; transform: translate(-50%, -60%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+#modalDetalhes {
+    animation: slideIn 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ==========================================================================
+   🏆 ESTILIZAÇÃO DE VALORES
+   ========================================================================== */
+
+/* .valores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.valor-item {
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9em;
+}
+
+.low-value {
+    background: #dff0d8;
+}
+
+.high-value {
+    background: #f2dede;
+}
+
+.media-calculada {
+    margin-top: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-align: center;
+} */
+
+/* ==========================================================================
+   🛠️ CONTROLES E BOTÕES
+   ========================================================================== */
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.control-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: #f8f9fa;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.control-btn:hover {
+    background: #e9ecef;
+}
+
+.timestamp-display {
+    font-size: 12px;
+    padding: 0 5px;
+    color: #333;
+}
+
+/* ==========================================================================
+   🔧 TEMPORÁRIOS / AJUSTES FINAIS
+   ========================================================================== */
+
+.formula-box {
+    background: #f4f4f4;
+    padding: 8px;
+    font-size: 1.2em;
+    text-align: center;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.formula-explanation {
+    display: flex;
+    justify-content: space-around;
+    margin: 10px 0;
+}
+
+.formula-item {
+    background: #e0e0e0;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    text-align: center;
+    flex: 1;
+    margin: 5px;
+}

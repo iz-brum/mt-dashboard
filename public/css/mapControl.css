@@ -1,0 +1,194 @@
+/**
+ * @file src/components/mapControls.css
+ * @description Folha de estilo para os controles customizados do mapa Leaflet.
+ * 
+ * Este arquivo contém:
+ * - Estilos para o container principal do controle.
+ * - Estilos para o cabeçalho do controle, incluindo o botão de toggle.
+ * - Estilos para a descrição do painel.
+ * - Estilos para o painel expandido que contém configurações (como sensibilidade de zoom, toggle de arrasto e limpeza de marcadores).
+ * - Estilos para a seção de sensibilidade de zoom, com imagens e input range.
+ * - Estilos para a seção de toggle de arrasto.
+ * - Estilos para a seção de limpar marcadores.
+ * - Estilos para o switch customizado.
+ * - Estados de hover e foco para interações.
+ */
+
+/* ==================== */
+/* 1. CONTAINER PRINCIPAL DO CONTROLE */
+/* ==================== */
+
+/* Define o estilo base para o container do controle customizado */
+.custom-map-control {
+    background: #fff;                           /* Fundo branco */
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);     /* Sombra para dar profundidade */
+    border-radius: 4px;                           /* Bordas arredondadas */
+}
+
+/* ==================== */
+/* 2. CABEÇALHO COM BOTÃO DE TOGGLE */
+/* ==================== */
+
+/* Estilo para o cabeçalho do controle, que contém o botão de toggle e a descrição */
+.control-header {
+    display: flex;                              /* Utiliza Flexbox para alinhamento */
+    justify-content: space-between;             /* Espaça os itens de forma uniforme */
+    align-items: center;                        /* Alinha verticalmente os itens */
+}
+
+/* ==================== */
+/* 3. DESCRIÇÃO DO PAINEL */
+/* ==================== */
+
+/* Estilo para a descrição do painel, exibida no cabeçalho */
+.panel-description {
+    font-size: 0.75rem;                         /* Tamanho de fonte reduzido (aproximadamente 12px) */
+    color: #555;                                /* Cor cinza para o texto */
+    display: none;                              /* Oculto por padrão */
+    margin-right: 25%;                          /* Margem à direita para espaçamento */
+}
+
+/* ==================== */
+/* 4. PAINEL EXPANDIDO */
+/* ==================== */
+
+/* Estilo para o painel expandido que contém as configurações */
+.expanded-panel {
+    display: none;                              /* Oculto por padrão (exibido ao ser expandido) */
+    padding: 10px 5px 5px;                       /* Padding interno: 10px no topo, 5px nas laterais e fundo */
+    min-width: 200px;                           /* Largura mínima para garantir espaço suficiente */
+}
+
+/* ==================== */
+/* 5. SEÇÃO DE SENSIBILIDADE DE ZOOM */
+/* ==================== */
+
+/* Define o layout da seção de sensibilidade de zoom */
+.zoom-sensitivity-section {
+    display: flex;                              /* Usa Flexbox para alinhar os itens */
+    align-items: center;                        /* Alinha verticalmente */
+    gap: 8px;                                   /* Espaço entre os itens */
+    padding: 5px 0;                             /* Padding vertical */
+}
+
+/* Estilos para a imagem (ícone) dentro da seção de sensibilidade de zoom */
+.zoom-sensitivity-section img {
+    width: 20px;                                /* Largura do ícone */
+    height: 20px;                               /* Altura do ícone */
+    vertical-align: middle;                     /* Alinha verticalmente com o texto */
+}
+
+/* Configura o input range para que ele ocupe o espaço disponível */
+.zoom-sensitivity-section input[type="range"] {
+    flex-grow: 1;                               /* Expande para preencher o espaço restante */
+}
+
+/* ==================== */
+/* 6. SEÇÃO DE TOGGLE DE ARRASTO */
+/* ==================== */
+
+/* Define o layout da seção para alternar o arrasto do mapa */
+.drag-toggle-section {
+    margin-top: 10px;                           /* Espaço acima da seção */
+    display: flex;                              /* Usa Flexbox para alinhar os itens */
+    align-items: center;                        /* Alinha verticalmente */
+    gap: 8px;                                   /* Espaço entre os itens */
+    padding: 5px 0;                             /* Padding vertical */
+}
+
+/* Define o tamanho do ícone (fa-hand-paper) dentro da seção de toggle de arrasto */
+.drag-toggle-section .fa-hand-paper {
+    font-size: 1.25rem;                         /* Tamanho da fonte (aproximadamente 20px) */
+}
+
+/* ==================== */
+/* 7. SEÇÃO DE LIMPAR MARCADORES */
+/* ==================== */
+
+/* Estilo para a seção que contém o botão de limpar marcadores */
+.clear-markers-section {
+    margin-top: 10px;                           /* Espaço acima da seção */
+    border-top: 1px solid #ccc;                  /* Borda superior para separação */
+    padding: 10px 0 0;                           /* Padding: 10px no topo, 0 nas laterais e fundo */
+    display: flex;                              /* Usa Flexbox para layout */
+    align-items: center;                        /* Alinha verticalmente */
+    gap: 6px;                                   /* Espaço entre os itens */
+}
+
+/* ==================== */
+/* 8. SWITCH CUSTOMIZADO */
+/* ==================== */
+
+/* Container do switch customizado */
+.switch {
+    position: relative;                         /* Posicionamento relativo para posicionamento dos elementos internos */
+    display: inline-block;
+    width: 40px;                                /* Largura do switch */
+    height: 20px;                               /* Altura do switch */
+}
+
+/* Esconde o input nativo do switch */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Estilos para o slider (parte visível do switch) */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;                     /* Cor de fundo padrão do switch */
+    transition: .4s;                            /* Transição suave para mudanças de estado */
+}
+
+/* Estilos para o indicador dentro do slider */
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;                               /* Altura do indicador */
+    width: 16px;                                /* Largura do indicador */
+    left: 2px;                                  /* Posição horizontal inicial */
+    bottom: 2px;                                /* Posição vertical inicial */
+    background-color: white;                    /* Cor de fundo do indicador */
+    transition: .4s;                            /* Transição suave para alterações de posição */
+}
+
+/* Estado quando o input está selecionado: altera o background e move o indicador */
+input:checked + .slider {
+    background-color: #2196F3;                  /* Cor de fundo quando selecionado */
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);                /* Move o indicador para a direita */
+}
+
+/* Estilos para um slider com bordas arredondadas */
+.slider.round {
+    border-radius: 34px;                        /* Arredonda o slider */
+}
+
+.slider.round:before {
+    border-radius: 50%;                         /* Arredonda o indicador */
+}
+
+/* ==================== */
+/* 9. ESTADOS DE HOVER E FOCO */
+/* ==================== */
+
+/* Efeito hover para o botão de toggle do painel */
+.toggle-panel:hover {
+    opacity: 0.8;                               /* Reduz a opacidade para indicar interatividade */
+}
+
+/* Define a aparência ao focar em botões, inputs ou o switch */
+button:focus,
+input:focus,
+.switch:focus {
+    outline: 2px solid #2196F3;                  /* Exibe um contorno azul */
+    outline-offset: 2px;                        /* Espaçamento entre o contorno e o elemento */
+}

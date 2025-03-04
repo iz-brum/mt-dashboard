@@ -1,0 +1,594 @@
+/**
+ * @file public/css/markerStyles.css
+ * @description Folha de estilos para popups e marcadores no mapa Leaflet.
+ * 
+ * Este arquivo contém:
+ * - Estilos base para popups do Leaflet
+ * - Layouts para organização de conteúdo dentro dos popups
+ * - Estilos para componentes de dados (blocos, cartões, etc.)
+ * - Regras de tipografia para labels e valores
+ * - Estilos para estados e feedback (erros, carregamento, ausência de dados)
+ * - Regras para interações, como botões de remoção
+ * - Organização de seções internas do popup (ex.: separação da seção telemétrica)
+ */
+
+/* ==================== */
+/* 1. ESTILOS BASE */
+/* ==================== */
+
+/* Define os estilos base para o conteúdo dos popups do Leaflet */
+.leaflet-popup-content {
+    min-width: 320px;
+    /* Largura mínima do popup */
+    width: fit-content;
+    /* Largura ajustada conforme o conteúdo */
+    max-width: 600px;
+    /* Largura máxima do popup */
+    margin: 30px 15px 15px;
+    /* Margens ao redor do popup */
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    /* Fonte utilizada no popup */
+    line-height: 1.25;
+    /* Altura da linha para melhor legibilidade */
+}
+
+/* Estiliza o botão de fechar do popup */
+.leaflet-container a.leaflet-popup-close-button {
+    top: 2px;
+    /* Posição superior do botão */
+    right: 4px;
+    /* Posição à direita do botão */
+    font: 19px / 24px Tahoma, Verdana, sans-serif;
+    /* Fonte e tamanho do botão */
+}
+
+/* ==================== */
+/* 2. LAYOUTS */
+/* ==================== */
+
+/* Grid principal para organização do conteúdo dentro do popup */
+.popup-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* Cria duas colunas de largura igual */
+    gap: 5px 15px;
+    /* Espaço entre linhas (12px) e colunas (25px) */
+    padding: 5px 0;
+    /* Espaçamento vertical interno */
+}
+
+/* Layout para a seção de coordenadas, também usado para geocodificação */
+.coordinate-section,
+.geocoding-coordinates {
+    grid-column: 2;
+    /* Ocupa todas as colunas da grid */
+    display: flex;
+    /* Exibe os itens em linha */
+    gap: 15px;
+    /* Espaçamento entre os itens */
+    margin-top: 5px;
+    /* Espaçamento acima da seção */
+}
+
+/* Layout específico para a janela de geocodificação */
+.geocoding-popup {
+    min-width: 240px;
+    /* Largura mínima da janela */
+    max-width: 300px;
+    /* Largura máxima da janela */
+    padding: 8px;
+    /* Espaçamento interno */
+}
+
+/* Grid para informações de geocodificação com colunas responsivas */
+.geocoding-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    /* Colunas que se ajustam conforme o espaço */
+    gap: 8px 5px;
+    /* Espaçamento entre os itens */
+    margin-bottom: 12px;
+    /* Espaçamento inferior */
+}
+
+/* ==================== */
+/* 3. COMPONENTES */
+/* ==================== */
+
+/* Blocos de dados para exibição de informações (para popups e geocodificação) */
+.data-item,
+.geocoding-data-item {
+    display: flex;
+    flex-direction: column;
+    /* Dispostos em coluna */
+    min-width: 0;
+    /* Garante que o conteúdo não ultrapasse o contêiner */
+    gap: 2px;
+    /* Espaçamento entre o label e o valor */
+}
+
+/* Estilos para os cartões que exibem dados telemétricos */
+.telemetric-card {
+    background: #f0f4ff;
+    /* Fundo claro para os cartões */
+    border-radius: 6px;
+    /* Bordas arredondadas */
+    padding: 6px 10px;
+    /* Espaçamento interno dos cartões */
+    border: 1px solid #eef2ff;
+    /* Borda suave */
+    display: inherit;
+    /* Herdam o display do contêiner pai */
+    cursor: pointer;
+}
+
+/* ==================== */
+/* 4. TIPOGRAFIA */
+/* ==================== */
+
+/* Estilos para os rótulos (labels) dos dados, tanto em popups quanto na geocodificação */
+.data-label,
+.geocoding-data-label {
+    color: #6b7280;
+    /* Cor cinza para os labels */
+    font-size: 0.9em;
+    /* Tamanho da fonte dos labels */
+    font-weight: 500;
+    /* Peso médio da fonte */
+    margin-bottom: 3px;
+    /* Espaçamento inferior */
+    letter-spacing: 0.05em;
+    /* Espaçamento entre letras */
+    text-transform: uppercase;
+    /* Converte o texto para maiúsculas */
+}
+
+/* Estilos para os valores dos dados */
+.data-value,
+.geocoding-data-value {
+    color: #1f2937;
+    /* Cor escura para os valores */
+    font-size: 0.95em;
+    /* Tamanho da fonte dos valores */
+    font-weight: 600;
+    /* Peso forte da fonte */
+    word-break: break-word;
+    /* Quebra de palavras para evitar overflow */
+}
+
+/* Destaque para os valores dentro dos cartões de dados telemétricos */
+.telemetric-card .data-value {
+    color: #1d4ed8;
+    /* Cor azul para realçar */
+    font-size: 1.1em;
+    /* Tamanho de fonte maior */
+}
+
+/* Estilos para as unidades de medida exibidas junto aos valores */
+.data-unit {
+    font-size: 1.15em;
+    /* Tamanho de fonte maior para as unidades */
+    color: #666;
+    /* Cor cinza para as unidades */
+}
+
+/* Estilos para os títulos das seções telemétricas */
+.telemetric-title {
+    color: #3f44b2;
+    /* Cor para o título */
+    font-size: 1.1em;
+    /* Tamanho de fonte para o título */
+    margin: 0;
+    /* Sem margens */
+}
+
+/* ==================== */
+/* 5. ESTADOS E FEEDBACK */
+/* ==================== */
+
+/* Estilos para mensagens de erro em dados telemétricos e geocodificação */
+.telemetric-error,
+.geocoding-error {
+    background: #fef2f2;
+    /* Fundo vermelho claro */
+    color: #dc2626;
+    /* Texto vermelho */
+    padding: 12px;
+    /* Espaçamento interno */
+    border-radius: 6px;
+    /* Bordas arredondadas */
+    border: 1px solid #fee2e2;
+    /* Borda com tom suave de vermelho */
+    font-size: 0.9em;
+    /* Tamanho da fonte para mensagens de erro */
+    margin: 10px 0;
+    /* Espaçamento vertical */
+}
+
+/* Estilos para mensagens de carregamento */
+.telemetric-loading,
+.geocoding-loading {
+    color: #64748b;
+    /* Cor cinza para o texto */
+    font-style: italic;
+    /* Texto em itálico */
+    text-align: center;
+    /* Alinhamento central */
+    padding: 15px;
+    /* Espaçamento interno */
+}
+
+/* Estilos para mensagens quando não há dados disponíveis */
+.telemetric-no-data,
+.geocoding-no-data {
+    color: #6b7280;
+    /* Cor cinza para o texto */
+    font-style: italic;
+    /* Texto em itálico */
+    padding: 15px 0;
+    /* Espaçamento vertical */
+    text-align: center;
+    /* Alinhamento central */
+}
+
+/* ==================== */
+/* 6. INTERAÇÕES */
+/* ==================== */
+
+/* Estilos para o botão de remoção de arquivos na geocodificação */
+.geocoding-remove-btn {
+    width: auto;
+    padding: 9px 11px;
+    background: #ef4444;
+    /* Fundo vermelho */
+    color: white;
+    /* Texto branco */
+    border: none;
+    /* Sem borda */
+    border-radius: 4px;
+    /* Bordas arredondadas */
+    cursor: pointer;
+    /* Cursor pointer para indicar clique */
+    font-weight: 600;
+    /* Fonte com peso forte */
+    transition: all 0.2s ease;
+    /* Transição suave para todas as propriedades */
+    margin-top: 10px;
+    /* Espaçamento superior */
+}
+
+/* Estilos para o efeito hover do botão de remoção */
+.geocoding-remove-btn:hover {
+    background: #dc2626;
+    /* Fundo mais escuro no hover */
+    transform: translateY(-1px);
+    /* Leve deslocamento para cima */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Sombra sutil */
+}
+
+/* ==================== */
+/* 7. ORGANIZAÇÃO DE SEÇÕES */
+/* ==================== */
+
+/* Define o layout da seção telemétrica dentro do popup.
+   Utiliza um grid com três colunas e adiciona uma borda superior para separar visualmente */
+.telemetric-section {
+    grid-column: 1 / -1;
+    /* Ocupa todas as colunas da grid */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* Três colunas de igual largura */
+    gap: 15px;
+    /* Espaçamento entre as colunas */
+    margin-top: 5px;
+    /* Espaçamento superior */
+    padding: 10px 0 0;
+    /* Espaçamento interno: topo, laterais e fundo */
+    border-top: 1px solid #e0e0e0;
+    /* Borda superior para separação */
+}
+
+/* Estilo para o cabeçalho da seção telemétrica, que ocupa toda a largura da grid */
+.telemetric-header {
+    grid-column: 1 / -1;
+}
+
+/* Ajusta a margem dos rótulos dentro do cabeçalho da seção telemétrica */
+.telemetric-header>.data-label {
+    margin: 8px 0 -11px 0;
+}
+
+/* Estilos para o conteúdo interno do marcador (ícone) */
+.marker-content {
+    padding: 2px 6px;
+    width: fit-content;
+}
+
+/* ================================ */
+/* Substituição das regras existentes */
+/* ================================ */
+
+/* Estilo para o container do popup */
+.popup-container {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Estilos para o header do popup, incluindo layout flex, transição de cor e arredondamento nos cantos superiores */
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 12px;
+    background-color: #f0f4ff;
+    /* Cor de fundo 8% mais escura */
+    border-bottom: 1px solid #e3e8ff;
+    /* Borda inferior suave */
+    margin: -4px -8px 0 -8px;
+    /* Ajuste de margem para alinhamento */
+    transition: background-color 0.2s ease;
+    border-radius: 28px 28px 0 0;
+    /* Arredonda apenas os cantos superiores */
+}
+
+/* Efeito hover para o header do popup, alterando a cor de fundo */
+.popup-header:hover {
+    background-color: #e8edff;
+    /* Fundo com tom 12% mais escuro no hover */
+}
+
+/* Estilos para o título dentro do header do popup */
+.popup-header>h4 {
+    margin: 0;
+    color: #374151;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+}
+
+/* Estilos para o ícone de toggle no header, com transição de transformação e rotação */
+.toggle-icon {
+    color: #4f46e5;
+    font-size: 14px;
+    margin-left: 10px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    line-height: 1;
+    padding: 4px;
+    transform-origin: center center;
+}
+
+/* Estilo para o ícone de toggle quando rotacionado */
+.toggle-icon.rotated {
+    transform: rotate(90deg);
+    color: #1e3a8a;
+}
+
+/* Transições para a grid do popup quando expandida ou recolhida */
+.popup-grid.expandable {
+    transition:
+        max-height 0.3s ease-out,
+        opacity 0.2s linear,
+        padding 0.3s ease-out;
+    max-height: 1000px;
+    /* Valor grande para permitir expansão completa */
+    opacity: 1;
+}
+
+.popup-grid.collapsed {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0 !important;
+    /* Garante que o padding seja removido */
+}
+
+
+/* ============= */
+
+.dynamic-marker {
+    transition: transform 0.2s ease;
+}
+
+.marker-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid white;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    padding: 0 10px;
+}
+
+
+.time-info {
+    border-bottom: 0px dotted #999;
+    transition: opacity 0.2s;
+    display: inline-flex;
+    /* Permite alinhamento do texto e imagem */
+    align-items: center;
+    gap: 5px;
+    /* Espaço entre o ícone e o texto */
+}
+
+.time-info:hover {
+    opacity: 0.8;
+}
+
+.icon-time,
+.icon-update {
+    width: 20px;
+    /* Ajuste o tamanho conforme necessário */
+    height: auto;
+    vertical-align: middle;
+}
+
+.icon-time,
+.icon-update {
+    transition: transform 0.2s ease-in-out;
+}
+
+.time-info:hover .icon-time,
+.time-info:hover .icon-update {
+    transform: scale(1.1);
+    /* Pequeno efeito de zoom ao passar o mouse */
+}
+
+
+/* ================== Floating Info Boxes ======================= */
+/* Container padrão para os quadros */
+.floating-info-box {
+    background: #f8f9fc;
+    border-radius: 6px;
+    padding: 8px 3px;
+    border: 1px solid #eef2ff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 90px;
+    z-index: 10000; /* Prioridade máxima */
+    position: fixed; /* Fixo em relação à viewport */
+    pointer-events: none; /* Permite interação com o mapa abaixo */
+    display: none;
+    /* Inicia oculto */
+}
+
+/* Cota - mais à esquerda do marcador */
+.floating-cota {
+    transform: translate(-55%, 0%);
+}
+
+/* Vazão - centralizada abaixo do marcador */
+.floating-vazao {
+    transform: translate(15%, 0%);
+}
+
+/* Chuva - mais à direita do marcador */
+.floating-chuva {
+    transform: translate(22%, 0%);
+}
+
+/* Ajuste dos textos dentro dos quadros */
+.floating-label {
+    color: #6b7280;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.floating-value {
+    color: #1d4ed8;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.floating-unit {
+    font-size: 1.15em;
+    color: #666;
+}
+
+/* ======= MODAL/GRAFICO */
+/* Modal Overlay */
+.telemetric-modal {
+    display: none;
+    /* Ocultado por padrão */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Overlay escuro */
+}
+
+/* Conteúdo do modal (caixa branca) */
+.telemetric-modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90vw;
+    height: 60vh;
+    border-radius: 4px;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    /* Caso o conteúdo exceda a altura */
+}
+
+/* Botão "X" para fechar */
+.telemetric-close {
+    position: absolute;
+    top: 2px;
+    right: 10px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.telemetric-close:hover {
+    color: #555;
+}
+
+/* Container para o texto do modal */
+#telemetricModalText {
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+/* Overlay para o spinner (enquanto carrega) */
+.spinner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Sem background => transparente */
+}
+
+/* Container do gráfico, caso queira estilizar */
+.chart-container {
+    width: 100%;
+    height: 48vh;
+    /* ou outro valor que preferir */
+    margin-top: 40px;
+}
+
+.modal-tabs-below {
+    margin: -28px 0 0 38px;
+}
+
+.modal-tab {
+    padding: 2px 15px;
+}
+
+
+/* ========= animação de carregamento do modal/grafico telemétrico */
+.spinner {
+    border: 10px solid rgba(0, 0, 0, 0.1);
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,115 @@
+/**
+ * @file public/css/rainFallControl.css
+ * @description Folha de estilo para o controle customizado de chuva no mapa.
+ * 
+ * Este arquivo contém:
+ * - Estilos para o container principal do controle de chuva.
+ * - Estilos para o botão de Play/Pause da animação de chuva.
+ * - Estilos para a área de exibição de data/hora no controle.
+ */
+
+/* ==================== */
+/* 1. CONTAINER PRINCIPAL DO CONTROLE DE CHUVA */
+/* ==================== */
+
+/* Define o estilo do container principal do controle de chuva */
+.rainfall-control-container {
+    background-color: white;
+    /* Fundo branco para destacar o controle */
+    padding: 2px 10px;
+    /* Padding vertical de 2px e horizontal de 10px */
+    display: flex;
+    /* Utiliza Flexbox para organizar os elementos internos em linha */
+    flex-direction: row;
+    /* Itens dispostos em uma única linha */
+    align-items: center;
+    /* Centraliza verticalmente os itens dentro do container */
+    gap: 10px;
+    /* Espaçamento de 10px entre os itens */
+    min-width: 180px;
+    /* Largura mínima do container para garantir visibilidade dos elementos */
+    top: 29px;
+    /* Posicionamento vertical (pode ser ajustado conforme necessário) */
+    left: 90px;
+    /* Posicionamento horizontal (pode ser ajustado conforme necessário) */
+}
+
+/* ==================== */
+/* 2. BOTÃO DE PLAY/PAUSE */
+/* ==================== */
+
+/* Estiliza o botão de Play/Pause utilizado para controlar a animação de chuva */
+.rainfall-play-pause {
+    display: inline-block;
+    /* Exibe como elemento inline-block */
+    font-size: 15px;
+    /* Tamanho de fonte de 18px para melhor visibilidade do ícone */
+    font-weight: bold;
+    /* Texto em negrito para destaque */
+    color: black;
+    /* Cor preta para o texto/ícone */
+    text-decoration: none;
+    /* Remove qualquer sublinhado ou decoração padrão */
+    width: 30px;
+    /* Largura definida para o botão, garantindo consistência no layout */
+    text-align: center;
+    /* Centraliza o conteúdo (ícone) horizontalmente dentro do botão */
+}
+
+/* ==================== */
+/* 3. ÁREA DE EXIBIÇÃO DE DATA/HORA */
+/* ==================== */
+
+/* Define o estilo para a área que exibe a data e hora do frame atual da animação de chuva */
+.rainfall-date-time {
+    font-size: 12px;
+    /* Tamanho de fonte de 12px para a exibição da data/hora */
+    color: black;
+    /* Cor preta para o texto */
+    white-space: nowrap;
+    /* Garante que o texto não quebre em duas linhas, mantendo-o em uma única linha */
+}
+
+/* Container da legenda */
+.rainfall-legend-container {
+    display: inline-block;
+    /* para que fique lado a lado com os outros itens */
+    margin-left: 10px;
+    /* espaçamento à esquerda */
+}
+
+/* Imagem da legenda */
+.rainfall-legend-image {
+    /* Substitua "30px" pela altura que você deseja (por ex. 25px ou 32px) */
+    height: 35px;    
+    width: auto;      
+    display: block;   /* ou inline-block, conforme seu gosto */
+}
+
+/* ==================== */
+/* MODAL PARA LEGENDA EXPANDIDA */
+/* ==================== */
+
+.rainfall-modal-overlay {
+    display: none;                   /* Oculto por padrão */
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.7);  /* Fundo semitransparente */
+    z-index: 9999;                  /* Ficar acima de tudo */
+    justify-content: center;
+    align-items: center;            /* Alinha imagem no centro vertical/horizontal */
+  }
+  
+  .rainfall-modal-overlay.active {
+    display: flex;    /* Quando ativo, exibe em flexbox (centraliza o conteúdo) */
+  }
+  
+  .rainfall-modal-overlay img {
+    max-width: 90%;
+    max-height: 90%;
+    border: 0px solid #fff;
+    border-radius: 20px;
+    background: #fff; /* Caso queira um fundo branco atrás da imagem */
+  }
+  

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <!-- META TAGS (Informações essenciais para o navegador e dispositivos móveis) -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HUB DE DADOS CLIMÁTICOS DE MT</title>
+
+    <!-- ESTILOS CSS -->
+    <!-- Estilos do Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <!-- Estilos do Plugin Leaflet Control Geocoder -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mapControl.css">
+    <link rel="stylesheet" href="css/layerControl.css">
+    <link rel="stylesheet" href="css/markerStyles.css">
+    <link rel="stylesheet" href="css/importControl.css">
+    <link rel="stylesheet" href="css/rainFallControl.css">
+
+    <!-- Font Awesome (Ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="assets/favicon_mt.ico" type="image/x-icon">
+
+    <!-- SCRIPTS -->
+    <!-- Scripts do Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Plugins do Leaflet -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <link rel="stylesheet" href="leaflet.groupedlayercontrol.css" />
+    <script src="leaflet.groupedlayercontrol.js"></script>
+
+    <!-- Suporte para KML e GPX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-plugins/3.0.3/layer/vector/KML.js"></script>
+    <script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
+
+    <!-- Plugin para Tela Cheia (Full Screen) -->
+    <script src="https://unpkg.com/leaflet.fullscreen/Control.FullScreen.js"></script>
+
+    <script type="text/javascript" async src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+
+<body>
+    <!-- Cabeçalho com logo e título -->
+    <header>
+        <img id="cornerLogo" src="assets/LOGO_sem_fundo.png" alt="Logo Superior" />
+        <h1 id="pageTitle">ESTAÇÕES FLUVIOMÉTRICAS EM MT - ANA</h1>
+    </header>
+
+    <!-- Conteúdo principal: mapa + blocos lado a lado -->
+    <main id="mainContent">
+        <!-- Div do mapa -->
+        <div id="map"></div>
+
+        <!-- 🟢 Agora os blocos de estatísticas estão ao lado do mapa -->
+        <section id="squareBlocks">
+            <div class="info-box square" data-tipo="totalCidadesMonitoradas">
+                <h3>Total de Cidades Monitoradas</h3>
+                <p id="totalCidades">--</p>
+            </div>
+            <div class="info-box square">
+                <h3>Estações Monitoradas</h3>
+                <p id="totalEstacoes">--</p>
+            </div>
+            <div class="info-box square">
+                <h3>Estações Desatualizadas</h3>
+                <p id="totalEstacoesNA">--</p>
+            </div>
+            <div class="info-box square" data-tipo="cidadesSemChuva">
+                <h3>Cidades sem Chuva</h3>
+                <p id="cidadesSemChuva">--</p>
+            </div>
+            <div class="info-box square" data-tipo="cidadesComChuvaElevada">
+                <h3>Cidades com Chuva Elevada</h3>
+                <p id="cidadesComChuvaElevada">--</p>
+            </div>
+            <div class="info-box square" data-tipo="medianaChuva">
+                <h3>Mediana</h3>
+                <p id="medianaChuva">--</p>
+            </div>
+            <div class="info-box square" data-tipo="mediaGeralChuva">
+                <h3>Média Geral</h3>
+                <p id="mediaGeralChuva">--</p>
+            </div>
+            <div class="info-box square" data-tipo="desvioPadraoChuva">
+                <h3>Desvio Padrão</h3>
+                <p id="desvioPadraoChuva">--</p>
+            </div>
+            <div class="info-box square">
+                <h3>MURB</h3>
+                <p id="">DCE - MT</p>
+            </div>
+            <div class="info-box square" id="maiorRegistro">
+                <h3>Maior Registro</h3>
+                <p id="maiorRegistroChuva">--</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- 🟢 Agora o gráfico está abaixo do mapa e dos blocos -->
+    <div id="chartContainer">
+        <canvas id="myChart"></canvas>
+    </div>
+
+
+    <div id="detalhesEstatistica"
+        style="display: none; padding: 10px; border: 1px solid #ccc; background: #f9f9f9; margin-top: 10px;"></div>
+
+    <!-- Modal Para Importação de Arquivos -->
+    <div id="importModal" class="import-modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <div id="dropArea" class="drop-area">
+                <!-- Inserir o arquivo SVG diretamente -->
+                <img src="/assets/draganddrop.svg" class="upload-icon" alt="Upload Icon" />
+                <span>Drag and drop file here</span>
+            </div>
+            <p>Or</p>
+            <button id="fileSelectButton" class="browse-btn">Browse for file</button>
+            <input type="file" id="fileInput" style="display: none;" multiple />
+
+            <!-- Lista de arquivos carregados -->
+            <div id="fileList"></div>
+
+            <!-- Botão OK -->
+            <button id="confirmUploadButton" style="display: none;">OK</button>
+        </div>
+    </div>
+
+    <script src="/dist/bundle.js"></script>
+</body>
+
+</html>

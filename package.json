@@ -1,0 +1,57 @@
+{
+  "name": "ana_map",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Aplicação de mapa usando Leaflet",
+  "main": "main.js",
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack serve --open",
+    "dev": "webpack serve --mode development --open",
+    "prod": "webpack --mode production",
+    "backend": "npx nodemon --verbose server/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mapbox/mapbox-gl-geocoder": "^5.0.3",
+    "chart.js": "^4.4.8",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "leaflet": "^1.9.4",
+    "leaflet-control-geocoder": "^3.1.0",
+    "leaflet-groupedlayercontrol": "^0.6.1",
+    "leaflet.fullscreen": "^3.0.2",
+    "mapbox-gl": "^2.15.0",
+    "node-fetch": "^3.3.2",
+    "three": "^0.149.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.7",
+    "@babel/preset-env": "^7.16.7",
+    "babel-loader": "^8.2.3",
+    "copy-webpack-plugin": "^9.1.0",
+    "css-loader": "^6.7.3",
+    "dotenv-webpack": "^7.1.1",
+    "nodemon": "^3.1.9",
+    "style-loader": "^3.3.1",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.7.1"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "imports": {
+    "#utils/*": "./src/utils/*",
+    "#apis/*": "./server/apis/*",
+    "#components/*": "./src/components/*"
+  }
+}

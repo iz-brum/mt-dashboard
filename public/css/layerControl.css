@@ -1,0 +1,219 @@
+/**
+ * @file public/css/layerControl.css
+ * @description Folha de estilo para o controle de camadas do mapa Leaflet.
+ * 
+ * Este arquivo contém:
+ * - Estilos para ajustar o tamanho do ícone do controle de camadas em dispositivos touch e telas retina.
+ * - Estilos para o container expandido do controle de camadas.
+ * - Estilos para os itens (labels) da lista de camadas, incluindo hover e transições.
+ * - Estilos para transformar os inputs (radios) em quadrados customizados.
+ * - Ajustes de alinhamento e layout para os overlays do controle de camadas.
+ */
+
+/* ==================== */
+/* 1. AJUSTES PARA DISPOSITIVOS TOUCH E TELAS RETINA */
+/* ==================== */
+
+/* Controla o tamanho do ícone do controle de camadas no modo touch */
+.leaflet-touch .leaflet-control-layers-toggle {
+    width: 30px;
+    height: 30px;
+}
+
+/* Controla o tamanho do ícone de camadas em telas retina, ajustando o background-size */
+.leaflet-retina .leaflet-control-layers-toggle {
+    background-size: 22px 22px;
+}
+
+/* ==================== */
+/* 2. CONTAINER EXPANDIDO DO CONTROLE DE CAMADAS */
+/* ==================== */
+
+/* Estilo para o container expandido do controle de camadas */
+.leaflet-control-layers-expanded {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+/* ==================== */
+/* 3. ITENS DA LISTA DE CAMADAS */
+/* ==================== */
+
+/* Estilo para cada item (label) da lista de camadas */
+.leaflet-control-layers-list label {
+    display: block;
+    /* Exibe cada label em bloco */
+    padding: 5px 8px;
+    /* Espaçamento interno: 5px vertical e 8px horizontal */
+    cursor: pointer;
+    /* Cursor pointer para indicar interatividade */
+    font-size: 14px;
+    /* Tamanho da fonte */
+    border-bottom: 1px solid #eee;
+    /* Borda inferior para separação */
+    transition: background-color 0.5s;
+    /* Transição suave para mudanças de background */
+}
+
+/* Remove a linha de separação no último label (opcional) */
+.leaflet-control-layers-list label:last-child {
+    border-bottom: none;
+}
+
+/* Efeito hover para os itens da lista: fundo cinza claro ao passar o mouse */
+.leaflet-control-layers-list label:hover {
+    background-color: #f7f7f7;
+}
+
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+    max-height: 500px;
+    /* Altura máxima para exibir a barra de rolagem vertical */
+    width: 400px;
+    /* Largura desejada do painel */
+    overflow-y: auto;
+    /* Ativa rolagem vertical */
+    overflow-x: hidden;
+    /* Esconde a barra de rolagem horizontal */
+    white-space: normal;
+    /* Permite que o texto seja quebrado em várias linhas */
+    word-wrap: break-word;
+    /* Quebra linhas mesmo em palavras longas */
+}
+
+/* ==================== */
+/* 4. PERSONALIZAÇÃO DOS INPUTS (RADIOS) */
+/* ==================== */
+
+/* Transforma os inputs do tipo radio em quadrados customizados */
+.leaflet-control-layers-list input[type="radio"] {
+    -webkit-appearance: none;
+    /* Remove a aparência padrão no Safari/Chrome */
+    -moz-appearance: none;
+    /* Remove a aparência padrão no Firefox */
+    appearance: none;
+    /* Remove a aparência padrão em navegadores modernos */
+
+    width: 16px;
+    /* Largura do quadrado */
+    height: 16px;
+    /* Altura do quadrado */
+    margin-right: 8px;
+    /* Espaço à direita para separar do texto */
+    border: 1px solid #777;
+    /* Borda cinza */
+    border-radius: 2px;
+    /* Cantos levemente arredondados */
+    background-color: #fff;
+    /* Fundo branco */
+    cursor: pointer;
+    /* Cursor pointer para indicar interatividade */
+    outline: none;
+    /* Remove outline padrão */
+    transition: background-color 0.2s, border-color 0.2s;
+    /* Transição suave para alterações */
+}
+
+/* Efeito hover para os inputs: altera a cor da borda ao passar o mouse */
+.leaflet-control-layers-list input[type="radio"]:hover {
+    border-color: #333;
+}
+
+/* Quando o input estiver selecionado, preenche o quadrado com a cor definida */
+.leaflet-control-layers-list input[type="radio"]:checked {
+    background-color: #007bff;
+    /* Cor de fundo quando selecionado */
+    border-color: #007bff;
+    /* Borda com a mesma cor */
+}
+
+/* Remove qualquer conteúdo interno padrão do input selecionado */
+.leaflet-control-layers-list input[type="radio"]:checked::after {
+    content: none;
+}
+
+/* ==================== */
+/* 5. AJUSTES PARA O CONTROLE DE CAMADAS (OVERLAYS) */
+/* ==================== */
+
+/* Estilo para os labels dos overlays dentro do controle */
+.leaflet-control-layers-overlays label {
+    display: flex !important;
+    /* Exibe os elementos em linha usando Flexbox */
+    align-items: center;
+    /* Alinha verticalmente os itens */
+    min-height: 24px;
+    /* Altura mínima para facilitar o toque em dispositivos móveis */
+    margin: 2px 0;
+    /* Margem vertical entre os itens */
+}
+
+/* Estilos para a exibição do nome da camada */
+.layer-name {
+    display: inline-flex;
+    /* Exibe em linha com flexibilidade */
+    align-items: center;
+    /* Alinha verticalmente os itens */
+    gap: 6px;
+    /* Espaço entre o ícone e o texto */
+    vertical-align: middle;
+    line-height: normal !important;
+}
+
+/* Estilos para o ícone da camada */
+.layer-icon {
+    width: 23px;
+    /* Largura do ícone */
+    height: 23px;
+    /* Altura do ícone */
+    object-fit: contain;
+    /* Garante que o ícone se ajuste sem distorções */
+    margin: 0 3px 0 10px;
+    /* Margens para posicionamento */
+    position: relative;
+    top: -1px;
+    /* Ajuste fino para alinhamento vertical */
+}
+
+/* Faz com que os spans dentro dos labels herdem a cor do texto para melhor integração visual */
+.leaflet-control-layers-overlays label span {
+    color: inherit !important;
+    display: flex;
+    align-items: center;
+}
+
+/* Ajusta o posicionamento do input nativo do Leaflet dentro dos overlays */
+.leaflet-control-layers-overlays input[type="radio"] {
+    margin-top: 0;
+    align-self: center;
+}
+
+/* Garante que todos os elementos filhos dos labels estejam alinhados verticalmente */
+.leaflet-control-layers-overlays label>* {
+    vertical-align: middle;
+}
+
+
+
+
+/* ======================== */
+
+/* Exemplo de estilo para o controle de filtros */
+.filter-control {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.filter-section {
+    margin-bottom: 8px;
+}
+
+.filter-section strong {
+    display: block;
+    margin-bottom: 4px;
+}
