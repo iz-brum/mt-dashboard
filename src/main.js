@@ -21,12 +21,11 @@
  * 
  */
 
-// Importa módulos necessários para as funcionalidades do mapa
 import { setupGeocoding } from '#components/geocoding/geocoding.js';
-import { setupMapControls } from '#components/controleMapa.js';
+import { setupMapControls, addClusterToggleControl } from '#components/controleMapa.js';
 import { setupImportControl } from '#components/controleImportacao.js';
-import { addLayerControl } from '#components/layers/controleCamadas.js';
-import { MAP_CONFIG } from '#utils/ana/config.js';
+import { initializeLayerControl } from '#components/layers/controleCamadas.js';
+import { MAP_CONFIG, APP_CONFIG } from '#utils/config.js';
 import { atualizarMarcadoresIncremental } from '#utils/ana/atualizarMarcadores.js';
 import { StationMarkers } from '#components/ana/gerenciadorDeMarcadores.js';
 import { showError } from '#utils/notificacoes.js';
@@ -34,76 +33,78 @@ import { showError } from '#utils/notificacoes.js';
 import { atualizarGraficoDeChuva } from '#utils/ana/telemetry/charts/verticalBarChart.js';
 import { atualizarEstatisticasNaUI } from '#utils/ana/telemetry/estatisticasChuva.js';
 import { configurarEventosEstatisticas } from '#utils/ana/telemetry/detalhesEstatisticas.js';
+import { addLocalAssetsThroughImporter } from '#components/layers/camadasBase.js';
 
-
-// Verifica se o elemento HTML com id "map" existe na página
-const mapElement = document.getElementById('map');
+// Utiliza o ID centralizado para buscar o elemento do mapa
+const mapElement = document.getElementById(APP_CONFIG.MAP_ELEMENT_ID);
 if (!mapElement) {
-    // Se não existir, loga um erro e exibe uma notificação ao usuário
-    const errorMessage = 'Elemento do mapa não encontrado. Verifique se o ID "map" está correto.';
+    const errorMessage = `Elemento do mapa não encontrado. Verifique se o ID "${APP_CONFIG.MAP_ELEMENT_ID}" está correto.`;
     console.error(errorMessage);
     showError(errorMessage);
 } else {
-    // Se o elemento existir, inicia a configuração do mapa de forma assíncrona
     (async () => {
         try {
-            // Verifica se a biblioteca Leaflet está carregada
             if (typeof L === 'undefined') {
                 throw new TypeError('Leaflet.js não está carregado. Verifique se a biblioteca foi importada corretamente.');
             }
 
-            // Inicia o timer para configuração do mapa
             console.time('Map Initialization');
 
-            // Cria a instância do mapa com a configuração vinda de MAP_CONFIG
-            const map = L.map('map', MAP_CONFIG);
+            // Cria a instância do mapa utilizando o ID configurado
+            const map = L.map(APP_CONFIG.MAP_ELEMENT_ID, MAP_CONFIG);
 
-            // Validação: assegura que a instância criada é realmente um objeto do Leaflet
             if (!(map instanceof L.Map)) {
                 throw new TypeError('Instância do mapa Leaflet inválida');
             }
 
-            // Finaliza o timer de configuração do mapa
             console.timeEnd('Map Initialization');
 
-            // Chama o initialize para registrar os eventos de moveend/zoomend
             StationMarkers.initialize(map);
-
-            // Agora carrega os marcadores:
             await StationMarkers.load();
 
-            console.time('Classification Layers Initialization');
-            const layerControl = await addLayerControl(map);
-            console.timeEnd('Classification Layers Initialization');
-            
-            // Inicializa os serviços de geocodificação, importação e controles customizados do mapa
-            setupGeocoding(map);
+            const { layerControl } = await initializeLayerControl(map);
+
+            if (!layerControl) {
+                console.error('Erro: initializeLayerControl não retornou um L.Control.Layers válido.');
+            } else {
+                // console.log('layerControl inicializado com sucesso:', layerControl);
+            }
+
+            // Carrega seu KML local (ou KMZ, GeoJSON etc.)
+            // Carrega os arquivos da pasta assets
+            const filesToLoad = [
+                'assets/dce-mt.kml',
+                'assets/br_mt.json',
+                // Adicione quantos quiser...
+            ];
+
+            await addLocalAssetsThroughImporter(filesToLoad, map, layerControl);
             setupImportControl(map, layerControl);
+
+
+            addClusterToggleControl(map);
+            setupGeocoding(map);
             setupMapControls(map);
 
-            // Atualiza o gráfico de chuvas e estatísticas na UI
             atualizarGraficoDeChuva();
             atualizarEstatisticasNaUI();
-            setTimeout(configurarEventosEstatisticas, 1000); // Pequeno delay para garantir que os elementos existem
+            setTimeout(configurarEventosEstatisticas, APP_CONFIG.CONFIG_EVENT_DELAY_MS);
 
-
-            // Inicialização opcional: configuração das camadas de precipitação horária
-            // setupHourlyRainfall(map);
-
-
-            // Atualiza o gráfico de chuvas, estatísticas e os marcadores a cada 5 minutos (300000 ms)
+            // Atualiza os marcadores, gráficos e estatísticas conforme o intervalo definido em APP_CONFIG
             setInterval(() => {
                 atualizarMarcadoresIncremental();
                 atualizarGraficoDeChuva();
                 atualizarEstatisticasNaUI();
-                setTimeout(configurarEventosEstatisticas, 1000); // Pequeno delay para garantir que os elementos existem
-            }, 30000);
-
+                setTimeout(configurarEventosEstatisticas, APP_CONFIG.CONFIG_EVENT_DELAY_MS);
+            }, APP_CONFIG.REFRESH_INTERVAL_MS);
 
         } catch (error) {
-            // Em caso de erro na inicialização do mapa, loga o erro e exibe uma notificação ao usuário
             console.error('Erro ao inicializar o mapa:', error);
             showError('Falha ao inicializar o mapa. Verifique o console para mais detalhes.');
         }
     })();
 }
+
+
+// Inicialização opcional: configuração das camadas de precipitação horária
+// setupHourlyRainfall(map);

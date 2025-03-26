@@ -5,8 +5,9 @@
  * da animação com base em timestamps.
  */
 
-import { formatTimestamp } from '../../utils/formatoData.js'; // Função para formatar o timestamp
-import { showError } from '../../utils/notificacoes.js';           // Função para exibir mensagens de erro
+import { formatTimestamp } from '#utils/formatoData.js'; // Função para formatar o timestamp
+import { showError } from '#utils/notificacoes.js';          // Função para exibir mensagens de erro
+import { DEFAULT_CONFIG } from '#utils/config.js';            // Importa a configuração centralizada
 
 /**
  * Cria um gerenciador de animação para uma camada específica.
@@ -27,20 +28,16 @@ export function createAnimationManager(map, productID, boundsMT, rainfallControl
      * @param {number} time - Timestamp para o qual o overlay deve ser carregado.
      */
     async function updateOverlay(time) {
-        // Monta a URL dos tiles utilizando o productID e o timestamp atual
-        const tileUrl = `http://localhost:3000/proxy/image?products=${productID}&time=${time}&x={x}&y={y}&z={z}`;
+        // Monta a URL dos tiles utilizando o productID, timestamp e a URL centralizada do proxy
+        const tileUrl = `${DEFAULT_CONFIG.TILE_PROXY_URL}?products=${productID}&time=${time}&x={x}&y={y}&z={z}`;
 
-        // Exemplo: createPane('rainfallPane')
+        // Cria o pane para os overlays de chuva
         map.createPane('rainfallPane');
-        // Ajuste o zIndex desse pane conforme a posição que você quer
-        // Se quiser que fique acima do tilePane (200) mas ainda abaixo do markerPane (600), pode ser algo entre 201 e 599
         map.getPane('rainfallPane').style.zIndex = 650;
 
-
-        // Cria a camada de tiles para o frame atual, com opacidade 0 para possibilitar o efeito de fade-in,
-        // restringida aos bounds fornecidos, com tamanho padrão de 256x256 e zoom máximo configurado.
+        // Cria a camada de tiles para o frame atual com opacidade 0 para o efeito fade-in
         nextOverlayLayer = L.tileLayer(tileUrl, {
-            pane: 'rainfallPane',    // Diga ao Leaflet qual pane usar
+            pane: 'rainfallPane',
             opacity: 0,
             bounds: boundsMT,
             tileSize: 256,
@@ -48,12 +45,12 @@ export function createAnimationManager(map, productID, boundsMT, rainfallControl
             maxZoom: 12,
         }).addTo(map);
 
-        // Aguarda o carregamento completo dos tiles da nova camada
+        // Aguarda o carregamento completo dos tiles
         await new Promise(resolve => {
             nextOverlayLayer.once('load', resolve);
         });
 
-        // Formata o timestamp para exibição e atualiza, se houver, o controle de chuva
+        // Formata o timestamp para exibição e atualiza o controle, se houver
         const formatted = formatTimestamp(time);
         console.log('(UTC+0):', formatted);
         if (rainfallControl && typeof rainfallControl.updateDateTime === 'function') {
@@ -66,18 +63,12 @@ export function createAnimationManager(map, productID, boundsMT, rainfallControl
 
     /**
      * Realiza a transição suave (fade) entre o overlay atual e o próximo overlay.
-     * A transição ocorre em duas fases: fade-out do overlay atual e fade-in do novo overlay.
      */
     function smoothTransition() {
         const fadeOutDuration = 3; // Duração do fade-out (em milissegundos)
         const fadeInDuration = 2;  // Duração do fade-in (em milissegundos)
-        let start = null;          // Variável para armazenar o timestamp inicial da animação
+        let start = null;
 
-        /**
-         * Função interna para realizar o fade-out do overlay atual.
-         * Ajusta a opacidade do overlay atual de 1 para 0 ao longo do tempo.
-         * @param {number} timestamp - Timestamp fornecido pelo requestAnimationFrame.
-         */
         function fadeOut(timestamp) {
             if (!start) start = timestamp;
             let progress = timestamp - start;
@@ -90,21 +81,15 @@ export function createAnimationManager(map, productID, boundsMT, rainfallControl
             if (progress < fadeOutDuration) {
                 animationFrameId = requestAnimationFrame(fadeOut);
             } else {
-                // Após completar o fade-out, remove o overlay atual do mapa e inicia o fade-in
                 if (overlayLayer) {
                     map.removeLayer(overlayLayer);
                 }
                 overlayLayer = null;
-                start = null; // Reinicia o timer para o fade-in
+                start = null;
                 animationFrameId = requestAnimationFrame(fadeIn);
             }
         }
 
-        /**
-         * Função interna para realizar o fade-in do novo overlay.
-         * Ajusta a opacidade do novo overlay de 0 para 1.
-         * @param {number} timestamp - Timestamp fornecido pelo requestAnimationFrame.
-         */
         function fadeIn(timestamp) {
             if (!start) start = timestamp;
             let progress = timestamp - start;
@@ -117,22 +102,18 @@ export function createAnimationManager(map, productID, boundsMT, rainfallControl
             if (progress < fadeInDuration) {
                 animationFrameId = requestAnimationFrame(fadeIn);
             } else {
-                // Ao final do fade-in, define o novo overlay como o overlay atual e traz para a frente
                 overlayLayer = nextOverlayLayer;
                 if (overlayLayer) {
                     overlayLayer.bringToFront();
-
                 }
                 nextOverlayLayer = null;
             }
         }
 
-        // Se houver uma animação em andamento, cancela-a
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
         }
 
-        // Inicia a animação com a fase de fade-out
         animationFrameId = requestAnimationFrame(fadeOut);
     }
 
@@ -150,33 +131,26 @@ export function createAnimationManager(map, productID, boundsMT, rainfallControl
             return;
         }
 
-        let currentFrame = 0;   // Índice do frame atual na lista de timestamps
-        let paused = false;     // Estado da animação (pausada ou não)
-        let timeoutId = null;   // ID do timeout para controle do delay entre frames
+        let currentFrame = 0;
+        let paused = false;
+        let timeoutId = null;
 
-        /**
-         * Função interna que avança para o próximo frame.
-         * Atualiza o overlay com base no timestamp atual e define o delay para o próximo frame.
-         */
         function nextFrame() {
-            if (paused) return; // Se a animação estiver pausada, não prossegue
+            if (paused) return;
 
             if (currentFrame >= timestamps.length) {
-                currentFrame = 0; // Reinicia a animação quando atingir o final da lista
+                currentFrame = 0;
             }
             updateOverlay(timestamps[currentFrame]);
 
-            // Define o delay: se for o último frame, delay maior; caso contrário, delay padrão
             const isLastFrame = (currentFrame === timestamps.length - 1);
             const delay = isLastFrame ? 15000 : 3000;
             currentFrame++;
             timeoutId = setTimeout(nextFrame, delay);
         }
 
-        // Inicia o loop de animação
         nextFrame();
 
-        // Retorna um controller com métodos para pausar e retomar a animação
         return {
             pause: function () {
                 paused = true;

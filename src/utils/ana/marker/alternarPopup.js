@@ -1,4 +1,5 @@
-// popupToggle.js
+// FILE: src/utils/ana/marker/alternarPopup.js
+
 export function attachPopupToggleEvents(popupEl) {
     popupEl.querySelectorAll('.popup-header').forEach(header => {
       const newHeader = header.cloneNode(true);

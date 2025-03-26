@@ -1,5 +1,5 @@
 /**
- * @file server/apis/ana/services/node/combineInventoryAndTelemetry.js
+ * @file server/apis/ana/services/node/mesclarDadosEstacoes.js
  * @description Módulo responsável por combinar os dados do inventário (dados estáticos das estações)
  * com os dados telemétricos (dados dinâmicos) e, posteriormente, categorizar as estações.
  * O resultado é um array com as estações mescladas, que pode ser utilizado para gerar agrupamentos
@@ -10,8 +10,6 @@ import fs from 'fs/promises';
 import path from 'path';
 import * as dateFnsTz from 'date-fns-tz';
 import { addHours } from 'date-fns';
-
-import { categorizeStations, getAllCategorizedStations } from '#utils/ana/classification/categorizacaoEstacoes.js';
 
 /**
  * Formata uma data no padrão "YYYY-MM-DD".
@@ -101,7 +99,7 @@ export async function mergeStationData() {
     missingTelemetryCount = 0; // ✅ Reseta o contador antes de iniciar a nova execução
 
     const inventory = await loadInventory();
-    const stationsToProcess = inventory.slice(0, 237); // Considerar parametrizar se necessário.
+    const stationsToProcess = inventory;
     const mergedStations = [];
 
     // Definir o fuso horário de Brasília (UTC-3)
@@ -114,9 +112,6 @@ export async function mergeStationData() {
     // Formatar hoje e ontem no fuso correto
     const today = dateFnsTz.format(now, 'yyyy-MM-dd', { timeZone });
     const yesterday = dateFnsTz.format(addHours(now, -24), 'yyyy-MM-dd', { timeZone });
-
-    // console.log("Hoje (Brasília):", today);
-    // console.log("Ontem (Brasília):", yesterday);
 
     const targetDate = formatDate(today);
     const targetYesterday = formatDate(yesterday);
@@ -148,33 +143,6 @@ export async function mergeStationData() {
 async function runCategorization() {
     try {
         const mergedStations = await mergeStationData();
-
-        // Usa a nova função para obter todas as estações categorizadas com índice
-        const allCategorizedStations = getAllCategorizedStations(mergedStations);
-        console.log('\nEstações categorizadas (total: ' + allCategorizedStations.length + '):');
-        allCategorizedStations.forEach(station => {
-            console.log(`Index: ${station.index} - Código: ${station.codigoestacao} - Classificação Chuva: ${station.classificacaoChuva}`);
-        });
-
-        const categories = categorizeStations(mergedStations);
-
-        console.log('\nEstações atualizadas:', categories.updated.length ?
-            categories.updated.map(st => st.codigoestacao).join(', ') : 'Nenhuma');
-        console.log('\nEstações desatualizadas:', categories.notUpdated.length ?
-            categories.notUpdated.map(st => st.codigoestacao).join(', ') : 'Nenhuma');
-
-        // Debug opcional: agrupa estações por classificações.
-        const groupByClassification = (stations, key) =>
-            stations.reduce((acc, station) => {
-                acc[station[key]] = acc[station[key]] || [];
-                acc[station[key]].push(station.codigoestacao);
-                return acc;
-            }, {});
-
-        console.log('\nClassificação por chuva:', groupByClassification([...categories.updated, ...categories.notUpdated], 'classificacaoChuva'));
-        console.log('\nClassificação por nível:', groupByClassification([...categories.updated, ...categories.notUpdated], 'classificacaoNivel'));
-        console.log('\nClassificação por vazão:', groupByClassification([...categories.updated, ...categories.notUpdated], 'classificacaoVazao'));
-
     } catch (error) {
         console.error('Erro ao mesclar e categorizar estações:', error);
     }

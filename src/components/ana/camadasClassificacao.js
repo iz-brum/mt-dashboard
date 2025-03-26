@@ -1,326 +1,258 @@
-// FILE: src/components/ana/camadasClassificacao.js
+/**
+ * @file src/components/ana/camadasClassificacao.js
+ */
 
 import { StationMarkers } from '#components/ana/gerenciadorDeMarcadores.js';
-import { createMarkerByDynamicClassification, createGeneralMarker } from '#utils/ana/marker/estiloMarcador.js';
+import { createMarkerByDynamicClassification } from '#utils/ana/marker/estiloMarcador.js';
 import { createPopupContent } from '#utils/ana/marker/conteudoPopup.js';
 import { attachPopupToggleEvents } from '#utils/ana/marker/alternarPopup.js';
-import { DEFAULT_CONFIG } from '#utils/ana/config.js';
 import { attachFloatingPopupEvents } from '#utils/ana/marker/floatingPopup.js';
+import { DEFAULT_CONFIG, CLASSIFICATION_CONFIG } from '#utils/config.js';
+import { FLOATING_POPUP_CONFIG } from '#utils/config.js';
+import { HybridLayer } from '#components/ana/HybridLayer.js';
+import { fetchTelemetricData } from '#utils/ana/marker/secaoTelemetria.js';
 
-/**
- * Converte stationLayer (que pode ser um layerGroup ou um array) para um array de marcadores.
- */
-function toMarkersArray(stationLayer) {
-  if (Array.isArray(stationLayer)) return stationLayer;
-  if (stationLayer && typeof stationLayer.eachLayer === 'function') {
-    const arr = [];
-    stationLayer.eachLayer(marker => arr.push(marker));
-    return arr;
-  }
-  return [];
+// Mapeia o "type" para o "layerType" que queremos usar no createClusterIcon
+// Removido suporte para 'status'
+function resolveLayerType(type) {
+  // if (type === 'status') return 'chuva';
+  return type; // 'chuva', 'nivel', 'vazao', 'rio', etc.
 }
 
-/**
- * Função auxiliar para processar um array em batches, retornando uma Promise.
- * Usamos setTimeout(…, 0) para não bloquear a thread principal entre os lotes.
- */
-function processBatch(items, batchSize, processItem) {
-  return new Promise(resolve => {
-    let index = 0;
-    function processNextBatch() {
-      const end = Math.min(index + batchSize, items.length);
-      for (let i = index; i < end; i++) {
-        processItem(items[i], i);
-      }
-      index += batchSize;
-
-      if (index < items.length) {
-        setTimeout(processNextBatch, 0);
-      } else {
-        resolve(); // Concluiu todos os itens
-      }
-    }
-    processNextBatch();
-  });
-}
-
-/**
- * Cria e retorna um marcador customizado para chuva, nível ou vazão.
- */
-function cloneMarkerWithDynamicStyle(marker, type) {
-  const latlng = marker.getLatLng();
-  let text = DEFAULT_CONFIG.INVALID_VALUE;
-  let classificationValue = "";
-
-  if (type === "chuva") {
-    text = (marker.stationData.chuvaAcumulada ?? DEFAULT_CONFIG.INVALID_VALUE)
-      .toString()
-      .substring(0, DEFAULT_CONFIG.MARKER_TEXT_LENGTH);
-    classificationValue = marker.stationData.classificacaoChuva;
-  } else if (type === "nivel") {
-    text = (marker.stationData.nivelMaisRecente ?? DEFAULT_CONFIG.INVALID_VALUE)
-      .toString()
-      .substring(0, DEFAULT_CONFIG.MARKER_TEXT_LENGTH);
-    classificationValue = marker.stationData.classificacaoNivel;
-  } else if (type === "vazao") {
-    text = (marker.stationData.vazaoMaisRecente ?? DEFAULT_CONFIG.INVALID_VALUE)
-      .toString()
-      .substring(0, DEFAULT_CONFIG.MARKER_TEXT_LENGTH);
-    classificationValue = marker.stationData.classificacaoVazao;
-  }
-
-  const customIcon = createMarkerByDynamicClassification(text, classificationValue, type);
-  const customMarker = L.marker(latlng, { icon: customIcon });
-  customMarker.stationData = { ...marker.stationData };
-
-  // Configura o popup de forma assíncrona
-  customMarker.bindPopup(() => {
-    const popup = L.DomUtil.create('div');
-    createPopupContent(customMarker.stationData).then(content => {
-      popup.innerHTML = content;
-      attachPopupToggleEvents(popup);
-    });
-    return popup;
-  }, { autoClose: false, closeOnClick: false });
-
-  // attachFloatingPopupEvents(customMarker, DEFAULT_CONFIG);
-  customMarker.on('add', () => {
-    attachFloatingPopupEvents(customMarker, DEFAULT_CONFIG);
-  });
-
-
-  return customMarker;
-}
-
-/**
- * Cria e retorna um marcador para status (atualizado/desatualizado).
- */
-function cloneMarkerByStatus(marker) {
-  const latlng = marker.getLatLng();
-  const text = (marker.stationData.chuvaAcumulada ?? 'N/A').toString();
-  const customIcon = createGeneralMarker(text);
-
-  const clonedMarker = L.marker(latlng, { icon: customIcon });
-  clonedMarker.stationData = { ...marker.stationData };
-
-  clonedMarker.bindPopup(() => {
-    const popup = L.DomUtil.create('div');
-    createPopupContent(clonedMarker.stationData).then(content => {
-      popup.innerHTML = content;
-      attachPopupToggleEvents(popup);
-    });
-    return popup;
-  }, { autoClose: false, closeOnClick: false });
-
-
-  clonedMarker.on('add', () => {
-    attachFloatingPopupEvents(clonedMarker, DEFAULT_CONFIG);
-  });
-
-
-  return clonedMarker;
-}
-
-/**
- * Cria e retorna um marcador para a classificação por rio, mantendo o estilo geral do marcador original.
- */
-function cloneMarkerByRio(marker) {
-  const latlng = marker.getLatLng();
-  const clonedMarker = L.marker(latlng, { icon: marker.options.icon });
-  clonedMarker.stationData = { ...marker.stationData };
-
-  clonedMarker.bindPopup(() => {
-    const popup = L.DomUtil.create('div');
-    createPopupContent(clonedMarker.stationData).then(content => {
-      popup.innerHTML = content;
-      attachPopupToggleEvents(popup);
-    });
-    return popup;
-  }, { autoClose: false, closeOnClick: false });
-
-  // attachFloatingPopupEvents(clonedMarker, DEFAULT_CONFIG);
-  // attachFloatingPopupEvents(clonedMarker, DEFAULT_CONFIG);
-  clonedMarker.on('add', () => {
-    attachFloatingPopupEvents(clonedMarker, DEFAULT_CONFIG);
-  });
-
-  return clonedMarker;
-}
-
-// Objeto que armazenará todas as camadas de classificação
 let layers = {};
 
+export function formatValue(value, unit) {
+  const numericValue = parseFloat(value);
+  if (isNaN(numericValue) || !isFinite(numericValue)) return 'N/A';
+
+  let formattedValue = numericValue;
+  if (numericValue >= 10000) {
+    formattedValue = (numericValue / 1000).toFixed(1) + 'k';
+  }
+  return `${formattedValue} ${unit}`;
+}
+
+function createClassificationMarker(marker, type) {
+  const latlng = marker.getLatLng();
+  let classificationValue = '';
+  let text = DEFAULT_CONFIG.INVALID_VALUE;
+
+  switch (type) {
+    case 'chuva':
+      classificationValue = marker.stationData.classificacaoChuva;
+      text = formatValue(marker.stationData.chuvaAcumulada, FLOATING_POPUP_CONFIG.units.rainfall);
+      break;
+    case 'nivel':
+      classificationValue = marker.stationData.classificacaoNivel;
+      text = formatValue(marker.stationData.nivelMaisRecente, FLOATING_POPUP_CONFIG.units.level);
+      break;
+    case 'vazao':
+      classificationValue = marker.stationData.classificacaoVazao;
+      text = formatValue(marker.stationData.vazaoMaisRecente, FLOATING_POPUP_CONFIG.units.discharge);
+      break;
+    // Removido o suporte a "status":
+    /*
+    case 'status':
+      classificationValue = marker.stationData.statusAtualizacao;
+      text = formatValue(marker.stationData.chuvaAcumulada, FLOATING_POPUP_CONFIG.units.rainfall);
+      break;
+    */
+    case 'rio':
+      classificationValue = marker.stationData.Rio_Nome || 'Desconhecido';
+      text = classificationValue;
+      break;
+    default:
+      classificationValue = CLASSIFICATION_CONFIG.DEFAULT_CLASSIFICATION;
+  }
+
+  text = text.toString().substring(0, DEFAULT_CONFIG.MARKER_TEXT_LENGTH);
+
+  // Define a classe extra com base no alerta de chuva (inicialmente pode ser vazia)
+  let extraClass = marker.stationData.highRainAlert ? 'blinking-marker' : '';
+  let customIcon = createMarkerByDynamicClassification(text, classificationValue, type, extraClass);
+
+  const newMarker = L.marker(latlng, { icon: customIcon });
+  newMarker.stationData = { ...marker.stationData };
+
+  newMarker.bindPopup(() => {
+    const popup = L.DomUtil.create('div');
+    createPopupContent(newMarker.stationData).then(content => {
+      popup.innerHTML = content;
+      attachPopupToggleEvents(popup);
+    });
+    return popup;
+  }, { autoClose: false, closeOnClick: false });
+
+  newMarker.on('add', () => attachFloatingPopupEvents(newMarker, DEFAULT_CONFIG));
+
+  // Após criar o marcador, busca os dados históricos para atualizar o alerta
+  fetchTelemetricData(newMarker.stationData.codigoestacao).then(data => {
+    if (data && data.dados) {
+      const highRainAlert = data.dados.some(r => parseFloat(r.Chuva_Adotada) > 25);
+      newMarker.stationData.highRainAlert = highRainAlert;
+      // Para debug, se desejar:
+      if (newMarker.stationData.codigoestacao === "66170600") {
+        // console.log("🚧 Debug (createClassificationMarker) - 66170600: highRainAlert =", highRainAlert);
+      }
+      // Atualiza o ícone com a classe se necessário
+      extraClass = highRainAlert ? 'blinking-marker' : '';
+      const updatedIcon = createMarkerByDynamicClassification(text, classificationValue, type, extraClass);
+      newMarker.setIcon(updatedIcon);
+    }
+  }).catch(err => {
+    console.error("Erro ao buscar dados históricos para alerta (createClassificationMarker):", err);
+  });
+
+  return newMarker;
+}
+
 /**
- * Retorna ou cria (sem limpar a cada chamada) uma layerGroup para o tipo e classificação fornecidos.
+ * Cria ou recupera uma HybridLayer para uma determinada camada de classificação.
+ * Removido o uso de 'status' para forçar 'chuva'.
  */
-function getOrCreateLayerForType(type, classification) {
-  const prefix = type === "chuva" ? "Chuva" :
-    type === "nivel" ? "Nível" :
-      type === "vazao" ? "Vazão" : "Rio";
-  const layerName = `${prefix} - ${classification}`;
+function getOrCreateHybridLayer(layerName, type) {
   if (!layers[layerName]) {
-    layers[layerName] = L.layerGroup();
+    const layerType = resolveLayerType(type);
+
+    // Cria a versão COM cluster
+    const clusterLayer = L.markerClusterGroup({
+      maxClusterRadius: 40,
+      // Chama a função createClusterIcon do StationMarkers com layerType
+      iconCreateFunction: (cluster) => StationMarkers.createClusterIcon(cluster, layerType),
+      showCoverageOnHover: true,
+      polygonOptions: {
+        color: '#0fde18',
+        weight: 4,
+        opacity: 0.9,
+        fillOpacity: 0.8
+      }
+    });
+
+    // Cria a versão SEM cluster
+    const noClusterLayer = L.layerGroup();
+
+    // Cria a HybridLayer que encapsula ambas as versões
+    layers[layerName] = new HybridLayer(clusterLayer, noClusterLayer, true);
   }
   return layers[layerName];
 }
 
-/**
- * Atualiza as camadas de chuva, nível ou vazão, processando marcadores em batch de forma assíncrona.
- */
-async function atualizarCamadasPorTipo(type, stationLayer) {
-  // Limpa as camadas do tipo correspondente
-  Object.keys(layers).forEach(name => {
-    if (
-      (type === "chuva" && name.startsWith("Chuva - ")) ||
-      (type === "nivel" && name.startsWith("Nível - ")) ||
-      (type === "vazao" && name.startsWith("Vazão - "))
-    ) {
-      layers[name].clearLayers();
-    }
-  });
-
-  const allMarkers = toMarkersArray(stationLayer);
-  console.log(`[atualizarCamadasPorTipo] Tipo: ${type} - Total de marcadores: ${allMarkers.length}`);
-
-  // Processa os marcadores em lotes
-  await processBatch(allMarkers, 235, marker => {
-    let classificationValue = "";
-    if (type === "chuva") classificationValue = marker.stationData.classificacaoChuva;
-    else if (type === "nivel") classificationValue = marker.stationData.classificacaoNivel;
-    else if (type === "vazao") classificationValue = marker.stationData.classificacaoVazao;
-
-    if (!classificationValue) classificationValue = "Indefinido";
-
-    const camada = getOrCreateLayerForType(type, classificationValue);
-    const customMarker = cloneMarkerWithDynamicStyle(marker, type);
-    camada.addLayer(customMarker);
-  });
-}
-
-/**
- * Atualiza as camadas de Rio, processando em batch.
- */
-async function atualizarCamadasRio(stationLayer) {
-  Object.keys(layers).forEach(name => {
-    if (name.startsWith("Rio - ")) {
-      layers[name].clearLayers();
-    }
-  });
-
-  const allMarkers = toMarkersArray(stationLayer);
-  console.log(`[atualizarCamadasRio] Total de marcadores: ${allMarkers.length}`);
-
-  await processBatch(allMarkers, 235, marker => {
-    const rio = marker.stationData.Rio_Nome || "Desconhecido";
-    const camada = getOrCreateLayerForType("rio", rio);
-    const cloned = cloneMarkerByRio(marker);
-    camada.addLayer(cloned);
-  });
-}
-
-/**
- * Atualiza as camadas de Status (Atualizado / Desatualizado), processando em batch.
- */
-async function atualizarCamadasStatus(allMarkers) {
-  if (layers["Status - Atualizado"]) layers["Status - Atualizado"].clearLayers();
-  if (layers["Status - Desatualizado"]) layers["Status - Desatualizado"].clearLayers();
-
-  if (!layers["Status - Atualizado"]) {
-    layers["Status - Atualizado"] = L.layerGroup();
-  }
-  if (!layers["Status - Desatualizado"]) {
-    layers["Status - Desatualizado"] = L.layerGroup();
-  }
-
-  const markersArray = toMarkersArray(allMarkers);
-  console.log(`[atualizarCamadasStatus] Total de marcadores: ${markersArray.length}`);
-
-  await processBatch(markersArray, 235, marker => {
-    const status = marker.stationData.statusAtualizacao;
-    if (!status) return;
-    const cloned = cloneMarkerByStatus(marker);
-    if (status === "Atualizado") {
-      layers["Status - Atualizado"].addLayer(cloned);
-    } else if (status === "Desatualizado") {
-      layers["Status - Desatualizado"].addLayer(cloned);
-    }
-  });
-}
-
-/**
- * Função para obter camadas por tipo (chuva, nível, vazão, rio).
- * Tornamos assíncrona para aguardar o batch quando for "rio".
- */
-async function getCamadasPorTipo(type, stationLayer) {
-  stationLayer = stationLayer || StationMarkers.getAllMarkers();
-
-  if (type === "rio") {
-    await atualizarCamadasRio(stationLayer);
-    return Object.fromEntries(Object.entries(layers).filter(([key]) => key.startsWith("Rio - ")));
-  }
-  await atualizarCamadasPorTipo(type, stationLayer);
-  const prefix = type === "chuva" ? "Chuva" : type === "nivel" ? "Nível" : "Vazão";
-  return Object.fromEntries(Object.entries(layers).filter(([key]) => key.startsWith(`${prefix} - `)));
-}
-
-/**
- * Função para obter camadas de Status.
- */
-async function getCamadasStatus() {
+async function atualizarCamadasPorTipo(type) {
+  const DEBUG_STATION_CODE = "66830000";
   const allMarkers = StationMarkers.getAllMarkers();
-  await atualizarCamadasStatus(allMarkers);
-  return {
-    "Status - Atualizado": layers["Status - Atualizado"],
-    "Status - Desatualizado": layers["Status - Desatualizado"]
-  };
+
+  Object.keys(layers)
+    .filter(name => name.startsWith(`${CLASSIFICATION_CONFIG.PREFIXES[type]} - `))
+    .forEach(name => {
+      if (layers[name]) {
+        layers[name]._clusterLayer.clearLayers();
+        layers[name]._noClusterLayer.clearLayers();
+      }
+    });
+
+  allMarkers.forEach(marker => {
+    const stationCode = marker.stationData.codigoestacao;
+    let classificationValue = "";
+
+    switch (type) {
+      case 'chuva':
+        classificationValue = marker.stationData.classificacaoChuva || CLASSIFICATION_CONFIG.DEFAULT_CLASSIFICATION;
+        break;
+      case 'nivel':
+        classificationValue = marker.stationData.classificacaoNivel || CLASSIFICATION_CONFIG.DEFAULT_CLASSIFICATION;
+        break;
+      case 'vazao':
+        classificationValue = marker.stationData.classificacaoVazao || CLASSIFICATION_CONFIG.DEFAULT_CLASSIFICATION;
+        break;
+      // Removido o case 'status'
+      /*
+      case 'status':
+        classificationValue = marker.stationData.statusAtualizacao || CLASSIFICATION_CONFIG.DEFAULT_CLASSIFICATION;
+        break;
+      */
+      case 'rio':
+        classificationValue = marker.stationData.Rio_Nome || 'Desconhecido';
+        break;
+      default:
+        classificationValue = CLASSIFICATION_CONFIG.DEFAULT_CLASSIFICATION;
+    }
+
+    if (classificationValue === CLASSIFICATION_CONFIG.DEFAULT_CLASSIFICATION && stationCode === DEBUG_STATION_CODE) {
+      // console.warn(`⚠ [Depuração] Marcador ${stationCode} indefinido para '${type}'`);
+    }
+
+    // Como não usamos 'status', layerName será composto somente pelo prefixo do tipo
+    const layerName = `${CLASSIFICATION_CONFIG.PREFIXES[type]} - ${classificationValue}`;
+
+    // Agora passamos "type" para getOrCreateHybridLayer
+    const hybridLayer = getOrCreateHybridLayer(layerName, type);
+
+    const classificationMarker = createClassificationMarker(marker, type);
+    if (classificationMarker) {
+      hybridLayer.addLayer(classificationMarker);
+    }
+  });
 }
 
-/**
- * Objeto principal que expõe as funções de classificação.
- */
+export async function atualizarCamadas() {
+  await Promise.all([
+    atualizarCamadasPorTipo('chuva'),
+    atualizarCamadasPorTipo('nivel'),
+    atualizarCamadasPorTipo('vazao'),
+    atualizarCamadasPorTipo('rio')
+    // Atualizar camadas de 'status' removido
+  ]);
+}
+
 export const ClassificationLayers = {
-  async initialize() {
-    const allMarkers = StationMarkers.getAllMarkers();
-    await atualizarCamadasPorTipo("chuva", allMarkers);
-    await atualizarCamadasPorTipo("nivel", allMarkers);
-    await atualizarCamadasPorTipo("vazao", allMarkers);
-    await atualizarCamadasRio(allMarkers);
-    await atualizarCamadasStatus(allMarkers);
-    // Marca que as camadas já foram inicializadas.
-    this.initialized = true;
-    return layers;
-  },
-
-  getLayers: () => layers,
-
-  // Se as camadas já foram inicializadas, simplesmente retorna o cache.
-  async getCamadasChuva(stationLayer) {
-    if (this.initialized) return Object.fromEntries(Object.entries(layers).filter(([key]) => key.startsWith("Chuva - ")));
-    return await getCamadasPorTipo("chuva", stationLayer);
-  },
-
-  async getCamadasNivel(stationLayer) {
-    if (this.initialized) return Object.fromEntries(Object.entries(layers).filter(([key]) => key.startsWith("Nível - ")));
-    return await getCamadasPorTipo("nivel", stationLayer);
-  },
-
-  async getCamadasVazao(stationLayer) {
-    if (this.initialized) return Object.fromEntries(Object.entries(layers).filter(([key]) => key.startsWith("Vazão - ")));
-    return await getCamadasPorTipo("vazao", stationLayer);
-  },
-
-  async getCamadasRio(stationLayer) {
-    if (this.initialized) return Object.fromEntries(Object.entries(layers).filter(([key]) => key.startsWith("Rio - ")));
-    return await getCamadasPorTipo("rio", stationLayer);
-  },
-
-  async getCamadasStatus() {
-    if (this.initialized) {
-      return {
-        "Status - Atualizado": layers["Status - Atualizado"],
-        "Status - Desatualizado": layers["Status - Desatualizado"]
-      };
+  initialize: async function () {
+    await atualizarCamadas();
+  
+    // Garante que todas as camadas definidas na ordem geral existam (mesmo vazias)
+    const allNames = [
+      // "Status - Atualizado",
+      // "Status - Desatualizado",
+      "Chuva - Extrema",
+      "Chuva - Muito Forte",
+      "Chuva - Forte",
+      "Chuva - Moderada",
+      "Chuva - Fraca",
+      "Chuva - Sem Chuva",
+      "Chuva - Indefinido",
+      "Nível - Alto",
+      "Nível - Normal",
+      "Nível - Baixo",
+      "Nível - Indefinido",
+      "Vazão - Alta",
+      "Vazão - Normal",
+      "Vazão - Baixa",
+      "Vazão - Indefinido"
+    ];
+  
+    for (const name of allNames) {
+      if (!layers[name]) {
+        const type = name.split(" - ")[0].toLowerCase(); // chuva, nível, etc.
+        layers[name] = getOrCreateHybridLayer(name, type);
+      }
     }
-    return await getCamadasStatus();
-  }
+  
+    this.initialized = true;
+  },
+  atualizarCamadas,
+  getClusterLayers: () => {
+    return Object.fromEntries(
+      Object.entries(layers).map(([key, hybridLayer]) => [key, hybridLayer._clusterLayer])
+    );
+  },
+  getNoClusterLayers: () => {
+    return Object.fromEntries(
+      Object.entries(layers).map(([key, hybridLayer]) => [key, hybridLayer._noClusterLayer])
+    );
+  },
+  getLayers: () => layers,
+  getCamadasChuva: () => Object.fromEntries(Object.entries(layers).filter(([key]) => key.startsWith(`${CLASSIFICATION_CONFIG.PREFIXES.chuva} - `))),
+  getCamadasNivel: () => Object.fromEntries(Object.entries(layers).filter(([key]) => key.startsWith(`${CLASSIFICATION_CONFIG.PREFIXES.nivel} - `))),
+  getCamadasVazao: () => Object.fromEntries(Object.entries(layers).filter(([key]) => key.startsWith(`${CLASSIFICATION_CONFIG.PREFIXES.vazao} - `))),
+  getCamadasRio: () => Object.fromEntries(Object.entries(layers).filter(([key]) => key.startsWith(`${CLASSIFICATION_CONFIG.PREFIXES.rio} - `))),
+  getCamadasStatus: () => ({}) // Retornando objeto vazio para não incluir camadas de status
 };

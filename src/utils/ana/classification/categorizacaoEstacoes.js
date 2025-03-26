@@ -3,31 +3,54 @@
  * @description Módulo para classificação geral das estações.
  */
 
+import { STATION_CLASSIFICATION_CONFIG } from '#utils/config.js';
+
+// Define a estação para debug
+const DEBUG_STATION_CODE = "66830000";
+
 // Funções de Classificação
-function classifyRainfall(totalRainfall) {
-  if (totalRainfall == null || isNaN(totalRainfall)) return "Indefinido";
-  if (totalRainfall === 0) return "Sem Chuva";
-  if (totalRainfall <= 5) return "Fraca";
-  if (totalRainfall <= 29) return "Moderada";
-  if (totalRainfall <= 59) return "Forte";
-  if (totalRainfall <= 99) return "Muito Forte";
-  return "Extrema";
+function classifyRainfall(totalRainfall, stationCode) {
+  const config = STATION_CLASSIFICATION_CONFIG.RAINFALL;
+
+  if (stationCode === DEBUG_STATION_CODE) {
+    // console.log(`🌧 [DEBUG] Classificando chuva (${totalRainfall}) para estação ${stationCode}`);
+  }
+
+  if (totalRainfall == null || isNaN(totalRainfall)) return config.undefined;
+  if (totalRainfall === 0) return config.noRain;
+  if (totalRainfall <= config.thresholds.weak) return config.weak;
+  if (totalRainfall <= config.thresholds.moderate) return config.moderate;
+  if (totalRainfall <= config.thresholds.strong) return config.strong;
+  if (totalRainfall <= config.thresholds.veryStrong) return config.veryStrong;
+  return config.extreme;
 }
 
-function classifyLevel(latestLevel) {
+function classifyLevel(latestLevel, stationCode) {
+  const config = STATION_CLASSIFICATION_CONFIG.LEVEL;
   const level = parseFloat(latestLevel);
-  if (isNaN(level) || latestLevel == null) return "Indefinido";
-  if (level < 400) return "Baixo";
-  if (level <= 450) return "Normal";
-  return "Alto";
+
+  if (stationCode === DEBUG_STATION_CODE) {
+    // console.log(`📏 [DEBUG] Classificando nível (${latestLevel}) para estação ${stationCode}`);
+  }
+
+  if (isNaN(level) || latestLevel == null) return config.undefined;
+  if (level < config.thresholds.low) return config.low;
+  if (level <= config.thresholds.normal) return config.normal;
+  return config.high;
 }
 
-function classifyDischarge(latestDischarge) {
+function classifyDischarge(latestDischarge, stationCode) {
+  const config = STATION_CLASSIFICATION_CONFIG.DISCHARGE;
   const discharge = parseFloat(latestDischarge);
-  if (isNaN(discharge) || latestDischarge == null) return "Indefinido";
-  if (discharge < 30) return "Baixa";
-  if (discharge <= 35) return "Normal";
-  return "Alta";
+
+  if (stationCode === DEBUG_STATION_CODE) {
+    // console.log(`💧 [DEBUG] Classificando vazão (${latestDischarge}) para estação ${stationCode}`);
+  }
+
+  if (isNaN(discharge) || latestDischarge == null) return config.undefined;
+  if (discharge < config.thresholds.low) return config.low;
+  if (discharge <= config.thresholds.normal) return config.normal;
+  return config.high;
 }
 
 // Utilitários de Data e Registros
@@ -44,49 +67,94 @@ function getLatestRecord(records) {
   }, null);
 }
 
-function calculateAccumulatedRainfall(records, referenceDate) {
+function calculateAccumulatedRainfall(records, referenceDate, stationCode) {
   if (!records || !referenceDate) return null;
-  const twentyFourHoursAgo = new Date(referenceDate.getTime() - 24 * 60 * 60 * 1000);
+  const periodMs = STATION_CLASSIFICATION_CONFIG.RAINFALL_ACCUMULATION_PERIOD_HOURS * 60 * 60 * 1000;
+  const startTime = new Date(referenceDate.getTime() - periodMs);
   const values = records
     .filter(record => {
       const recordDate = parseLocalDate(record.Data_Hora_Medicao);
-      return recordDate && recordDate >= twentyFourHoursAgo && recordDate <= referenceDate;
+      return recordDate && recordDate >= startTime && recordDate <= referenceDate;
     })
     .map(record => parseFloat(record.Chuva_Adotada))
     .filter(v => !isNaN(v));
+
+  if (stationCode === DEBUG_STATION_CODE) {
+    // console.log(`🌧 [DEBUG] Cálculo de chuva acumulada para estação ${stationCode}:`, values);
+  }
+
   return values.length ? values.reduce((sum, val) => sum + val, 0) : null;
 }
 
-// Função de Categorização Geral de uma Estação
 export function categorizeStation(stationData) {
+  const stationCode = String(stationData.codigoestacao);
+  if (stationCode === DEBUG_STATION_CODE) {
+    // console.log(`🚀 [DEBUG] Categorizando estação ${stationCode}...`);
+  }
+
   const records = Array.isArray(stationData.dados) ? stationData.dados : [];
-  const completeness = records.length &&
-    records.every(r => r.Chuva_Adotada != null && r.Cota_Adotada != null && r.Vazao_Adotada != null)
-    ? "Completo" : "Incompleto";
-  const latestRecord = getLatestRecord(records);
+
+  // 🛠 Verificar se há registros disponíveis
+  if (stationCode === DEBUG_STATION_CODE) {
+    // console.log(`📜 [DEBUG] Registros disponíveis para ${stationCode}:`, records);
+  }
+
+  let latestRecord = getLatestRecord(records);
+
+  // ✅ Correção: Se não houver registros, utilizar os valores de stationData diretamente
+  if (!latestRecord) {
+    latestRecord = {
+      Data_Hora_Medicao: stationData.Data_Hora_Medicao || null,
+      Chuva_Adotada: stationData.chuvaAcumulada ?? null,
+      Cota_Adotada: stationData.nivelMaisRecente ?? null,
+      Vazao_Adotada: stationData.vazaoMaisRecente ?? null
+    };
+  }
+
+  // 🛠 Verificar qual é o último registro encontrado
+  if (stationCode === DEBUG_STATION_CODE) {
+    // console.log(`📅 [DEBUG] Último registro para ${stationCode}:`, latestRecord);
+  }
+
   const referenceDate = latestRecord ? parseLocalDate(latestRecord.Data_Hora_Medicao) : new Date();
-  const accumulatedRainfall = calculateAccumulatedRainfall(records, referenceDate);
-  const updateStatus = latestRecord
-    ? ((new Date() - parseLocalDate(latestRecord.Data_Hora_Medicao)) / (1000 * 60 * 60) <= 12 ? "Atualizado" : "Desatualizado")
+
+  // ✅ Correção: Se a chuva acumulada não for encontrada, use stationData.chuvaAcumulada diretamente
+  let accumulatedRainfall = calculateAccumulatedRainfall(records, referenceDate, stationCode);
+  if (accumulatedRainfall === null) {
+    accumulatedRainfall = stationData.chuvaAcumulada ?? null;
+  }
+
+  // 🛠 Log detalhado do cálculo da chuva acumulada
+  if (stationCode === DEBUG_STATION_CODE) {
+    // console.log(`🌧 [DEBUG] Chuva acumulada calculada para ${stationCode}:`, accumulatedRainfall);
+  }
+
+  const updateThreshold = STATION_CLASSIFICATION_CONFIG.UPDATE_THRESHOLD_HOURS;
+  const updateStatus = latestRecord.Data_Hora_Medicao
+    ? ((new Date() - parseLocalDate(latestRecord.Data_Hora_Medicao)) / (1000 * 60 * 60) <= updateThreshold ? "Atualizado" : "Desatualizado")
     : "Desatualizado";
 
+  const classificacaoChuva = classifyRainfall(accumulatedRainfall, stationCode);
+  const classificacaoNivel = classifyLevel(latestRecord.Cota_Adotada, stationCode);
+  const classificacaoVazao = classifyDischarge(latestRecord.Vazao_Adotada, stationCode);
+
   return {
-    codigoestacao: stationData.codigoestacao,
+    codigoestacao: stationCode,
     Estacao_Nome: stationData.Estacao_Nome,
     data: stationData.data,
     Rio_Nome: stationData.Rio_Nome || "Desconhecido",
     latitude: parseFloat(stationData.Latitude) || null,
     longitude: parseFloat(stationData.Longitude) || null,
-    completude: completeness,
     chuvaAcumulada: accumulatedRainfall != null ? Number(accumulatedRainfall.toFixed(2)) : null,
-    nivelMaisRecente: latestRecord ? latestRecord.Cota_Adotada : null,
-    vazaoMaisRecente: latestRecord ? latestRecord.Vazao_Adotada : null,
+    nivelMaisRecente: latestRecord.Cota_Adotada,
+    vazaoMaisRecente: latestRecord.Vazao_Adotada,
     statusAtualizacao: updateStatus,
-    classificacaoChuva: classifyRainfall(accumulatedRainfall),
-    classificacaoNivel: classifyLevel(latestRecord ? latestRecord.Cota_Adotada : null),
-    classificacaoVazao: classifyDischarge(latestRecord ? latestRecord.Vazao_Adotada : null)
+    classificacaoChuva,
+    classificacaoNivel,
+    classificacaoVazao
   };
 }
+
 
 // Agrupa um array de estações por diferentes classificações
 export function categorizeStations(stationsArray) {
@@ -134,6 +202,5 @@ export function getAllCategorizedStations(stationsArray) {
     categorized.index = index;
     return categorized;
   });
-  // console.log("Lista completa de estações categorizadas:", categorizedList);
   return categorizedList;
 }

@@ -1,55 +1,68 @@
-// FILE: src\utils\ana\atualizarMarcadores.js
+// file src/utils/ana/atualizarMarcadores.js
 
 import { StationMarkers } from '#components/ana/gerenciadorDeMarcadores.js';
-import { modalState } from '#utils/ana/telemetry/secaoTelemetria.js';
-import { updateModalContent } from '#utils/ana/telemetry/secaoTelemetria.js';
+import { modalState, updateModalContent } from '#utils/ana/marker/secaoTelemetria.js';
+import { DEFAULT_CONFIG, CACHE_CONFIG, APP_CONFIG } from '#utils/config.js';
 
-let stationCache = null; // Cache de dados
+let stationCache = null;
 let lastUpdateTime = 0;
-const CACHE_TIME_MS = 2 * 60 * 1000; // Cache por 5 minutos
+const CACHE_TIME_MS = CACHE_CONFIG.STATIONS.TTL;
+const UPDATE_INTERVAL = APP_CONFIG.MARKER_UPDATE_INTERVAL_MS;
+let updateIntervalId = null;
 
 async function fetchStations() {
   const now = Date.now();
   if (stationCache && now - lastUpdateTime < CACHE_TIME_MS) {
-    // console.log("⚡ Usando cache para atualizar marcadores.");
     return stationCache;
   }
 
-  // console.log("🔄 Buscando atualizações no backend...");
   try {
-    const response = await fetch('http://localhost:3000/api/stationData');
+    // Utiliza a URL centralizada no DEFAULT_CONFIG
+    const response = await fetch(DEFAULT_CONFIG.DATA_SOURCE);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     stationCache = await response.json();
-    lastUpdateTime = now;
+    lastUpdateTime = Date.now();
     return stationCache;
   } catch (error) {
     console.error("❌ Erro ao buscar estações:", error);
-    return [];
+    return stationCache || []; // Retorna cache anterior se disponível
   }
 }
 
-let atualizarTimer = null;
-
 export async function atualizarMarcadoresIncremental() {
-  if (atualizarTimer) {
-    console.log("⚠️ Esperando para atualizar, ignorando chamada duplicada.");
-    return;
-  }
+  try {
+    const newStations = await fetchStations();
+    await StationMarkers.update(newStations);
 
-  atualizarTimer = setTimeout(async () => {
-    try {
-      const newStations = await fetchStations(); // ⚡ Usa cache
-      await StationMarkers.update(newStations);
-
-      // Atualiza os gráficos do modal somente se ele estiver aberto
-      if (modalState.isOpen && modalState.stationCode && modalState.activeType && modalState.stationName) {
-        updateModalContent(modalState.activeType, modalState.stationCode, modalState.stationName, true);
-      }
-    } catch (error) {
-      console.error("❌ Erro ao atualizar marcadores:", error);
-    } finally {
-      clearTimeout(atualizarTimer);
-      atualizarTimer = null;
+    if (modalState.isOpen && modalState.stationCode && modalState.activeType && modalState.stationName) {
+      updateModalContent(
+        modalState.activeType,            // activeType
+        modalState.stationCode,           // stationCode
+        modalState.stationName,           // stationName
+        modalState.stationMunicipio_Nome, // stationMunicipio_Nome (nome da cidade)
+        true                              // skipSpinner (ou false, conforme a necessidade)
+        // Se necessário, o intervalo pode ser passado como 6º parâmetro
+      );
     }
-  }, 3000); // Aguarda 3 segundos antes de permitir uma nova chamada
+  } catch (error) {
+    console.error("❌ Erro ao atualizar marcadores:", error);
+  }
+}
+
+export function startAutoUpdate() {
+  if (!updateIntervalId) {
+    // Primeira execução imediata
+    atualizarMarcadoresIncremental();
+    // Configura intervalo periódico
+    updateIntervalId = setInterval(atualizarMarcadoresIncremental, UPDATE_INTERVAL);
+    console.log("🔄 Atualização automática iniciada (30 segundos)");
+  }
+}
+
+export function stopAutoUpdate() {
+  if (updateIntervalId) {
+    clearInterval(updateIntervalId);
+    updateIntervalId = null;
+    console.log("⏹ Atualização automática parada");
+  }
 }

@@ -7,14 +7,14 @@
  * para evitar requisições desnecessárias.
  */
 
-import { convertTimestampToDate } from '../../../../src/utils/formatoData.js'; // Importa a função para converter um timestamp para um objeto Date (UTC)
-// import { convertTimestampToDate } from '../../../../src/utils/formatTimestamp.js';
+import { convertTimestampToDate } from '#utils/formatoData.js';
+import { DEFAULT_CONFIG, CACHE_CONFIG } from '#utils/config.js';
 
 // Cache para armazenar os dados retornados pela API e evitar requisições frequentes
 const apiCache = {
     data: null,         // Dados armazenados (timestamps)
     timestamp: null,    // Momento em que os dados foram armazenados (em milissegundos)
-    ttl: 1 * 60 * 60 * 1000 // Tempo de vida do cache: 1 hora em milissegundos
+    ttl: CACHE_CONFIG.TIMESTAMPS.TTL // Tempo de vida do cache definido na configuração
 };
 
 /**
@@ -24,13 +24,11 @@ const apiCache = {
  * @returns {Array<string>} Array de timestamps filtrados que ocorreram entre duas horas atrás e agora (UTC).
  */
 function filterTimestamps(data) {
-    const nowUTC = new Date(Date.now()); // Data e hora atuais em UTC
-    // Calcula a data e hora de duas horas atrás a partir do momento atual
+    const nowUTC = new Date(Date.now());
     const twoHoursAgoUTC = new Date(nowUTC.getTime() - 2 * 60 * 60 * 1000);
 
-    // Filtra os timestamps, mantendo somente os que estão entre duas horas atrás e agora
     return data.filter(timestamp => {
-        const tsDate = convertTimestampToDate(timestamp); // Converte o timestamp para objeto Date (UTC)
+        const tsDate = convertTimestampToDate(timestamp);
         return tsDate >= twoHoursAgoUTC && tsDate <= nowUTC;
     });
 }
@@ -46,15 +44,14 @@ function filterTimestamps(data) {
 export async function fetchTimestamps(productID, useCache = true) {
     try {
         const now = Date.now();
-        // Verifica se o cache deve ser utilizado e se os dados armazenados ainda são válidos
+        // Verifica se o cache está válido
         if (useCache && apiCache.data && now - apiCache.timestamp < apiCache.ttl) {
             console.log('Usando dados do cache...');
             return filterTimestamps(apiCache.data);
         }
 
-        // Faz a requisição à API usando o productID
-        const response = await fetch(`https://realearth.ssec.wisc.edu/api/times?products=${productID}`);
-        // Se a resposta não for OK, lança um erro com a mensagem do status
+        // Realiza a requisição usando a URL centralizada no DEFAULT_CONFIG
+        const response = await fetch(`${DEFAULT_CONFIG.REAL_EARTH_API_URL}?products=${productID}`);
         if (!response.ok) throw new Error(`Erro na requisição: ${response.statusText}`);
         const data = await response.json();
 
@@ -63,7 +60,7 @@ export async function fetchTimestamps(productID, useCache = true) {
             throw new Error('Nenhum tempo disponível na resposta da API.');
         }
 
-        // Atualiza o cache com os dados obtidos e a hora atual
+        // Atualiza o cache com os dados obtidos e o momento atual
         apiCache.data = data[productID];
         apiCache.timestamp = now;
 
@@ -71,7 +68,7 @@ export async function fetchTimestamps(productID, useCache = true) {
         return filterTimestamps(apiCache.data);
     } catch (error) {
         console.error('Erro ao carregar tempos:', error.message);
-        throw error; // Propaga o erro para tratamento posterior
+        throw error;
     }
 }
 
@@ -85,11 +82,11 @@ export async function fetchTimestamps(productID, useCache = true) {
 export async function refreshTimestamps(productID) {
     try {
         // Realiza a requisição à API para buscar os timestamps
-        const response = await fetch(`https://realearth.ssec.wisc.edu/api/times?products=${productID}`);
+        const response = await fetch(`${DEFAULT_CONFIG.REAL_EARTH_API_URL}?products=${productID}`);
         if (!response.ok) throw new Error(`Erro na requisição: ${response.statusText}`);
         const data = await response.json();
 
-        // Verifica se os dados retornados estão no formato esperado e se há timestamps
+        // Verifica se os dados retornados estão no formato esperado e se há timestamps disponíveis
         if (!data || !data[productID] || !Array.isArray(data[productID]) || data[productID].length === 0) {
             throw new Error('Nenhum tempo disponível na resposta da API.');
         }
@@ -98,6 +95,6 @@ export async function refreshTimestamps(productID) {
         return filterTimestamps(data[productID]);
     } catch (error) {
         console.error('Erro ao atualizar timestamps:', error.message);
-        throw error; // Propaga o erro para tratamento posterior
+        throw error;
     }
 }

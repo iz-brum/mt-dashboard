@@ -1,3 +1,4 @@
+import { DEFAULT_CONFIG } from '#utils/config.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 Chart.register(ChartDataLabels);
 
@@ -22,23 +23,39 @@ Chart.register(
     Legend
 );
 
-// 🔄 Agora o gráfico é vertical
+/**
+ * Renderiza um gráfico de barras verticais com dados fornecidos.
+ * Adiciona debug detalhado para depuração dos dados usados no gráfico.
+ *
+ * @param {string} canvasId - ID do elemento canvas onde o gráfico será renderizado.
+ * @param {Object} dataConfig - Configuração dos dados do gráfico.
+ * @returns {Chart} Instância do gráfico renderizado.
+ */
 export function renderVerticalBarChart(canvasId, dataConfig) {
+    // console.log("📊 [DEBUG] Iniciando renderização do gráfico...");
+
     const ctx = document.getElementById(canvasId)?.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+        console.warn("⚠️ [DEBUG] Canvas não encontrado para o gráfico.");
+        return;
+    }
 
     if (Chart.getChart(ctx)) {
         Chart.getChart(ctx).destroy();
     }
 
+    // 🔹 Estruturação dos dados de entrada
     const dataPairs = dataConfig.labels.map((label, i) => ({
+        index: i + 1, // Adicionando índice baseado na posição do array
         label,
-        shortLabel: label.split(' ').slice(0, 2).join(' '),
+        shortLabel: label.split(' ').slice(0, 2).join(' '), // Mantém apenas as 2 primeiras palavras
         value: dataConfig.values[i]
     }));
 
+    // 🔹 Filtra valores válidos (não-nulos e maiores que zero)
     const validPairs = dataPairs.filter(pair => typeof pair.value === 'number' && pair.value > 0);
     validPairs.sort((a, b) => b.value - a.value);
+
 
     const sortedLabels = validPairs.map(pair => pair.shortLabel);
     const fullLabels = validPairs.map(pair => pair.label);
@@ -58,20 +75,20 @@ export function renderVerticalBarChart(canvasId, dataConfig) {
             }]
         },
         options: {
-            indexAxis: 'x', // 🔄 Agora é vertical
+            indexAxis: 'x', // 🔄 Gráfico vertical
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                y: { // 🔄 Ajustado para eixo Y ser categórico
+                y: {
                     beginAtZero: true,
                     ticks: { precision: 0 }
                 },
-                x: { // 🔄 Aqui está o eixo que contém os nomes das cidades!
+                x: {
                     ticks: {
-                        font: { size: 8 }, // 🔹 Ajuste o tamanho da fonte dos nomes das cidades
-                        autoSkip: false, // 🔹 Garante que todos os rótulos sejam exibidos
-                        maxRotation: 90, // 🔹 Inclina os nomes para melhor visualização (90° = vertical)
-                        minRotation: 35  // 🔹 Define um ângulo mínimo para melhor leitura
+                        font: { size: 8 },
+                        autoSkip: false,
+                        maxRotation: 90,
+                        minRotation: 35
                     }
                 }
             },
@@ -80,14 +97,14 @@ export function renderVerticalBarChart(canvasId, dataConfig) {
                     display: !!dataConfig.title,
                     text: dataConfig.title,
                     font: { size: 17, weight: 'bold' },
-                    padding: { top: 10, bottom: -15 } // 🔽 Aumente esse valor para abaixar o título
+                    padding: { top: 10, bottom: -15 }
                 },
                 legend: {
                     display: dataConfig.showLegend !== undefined ? dataConfig.showLegend : true,
-                    position: 'top', // 🔹 Move a legenda para cima
-                    align: 'end', // 🔹 Alinha a legenda à direita do título
+                    position: 'top',
+                    align: 'end',
                     labels: {
-                        boxWidth: 15, // 🔹 Reduz o tamanho do ícone na legenda
+                        boxWidth: 15,
                         font: { size: 14 }
                     }
                 },
@@ -111,41 +128,56 @@ export function renderVerticalBarChart(canvasId, dataConfig) {
 let chartInstance = null;
 let ultimoDataset = null;
 
+/**
+ * Atualiza o gráfico de chuvas por cidade utilizando a média dos valores.
+ * Inclui logs de depuração para acompanhar os dados utilizados.
+ */
 export async function atualizarGraficoDeChuva() {
     try {
-        const response = await fetch('http://localhost:3000/api/stationData/estacoes/chuvaPorCidade');
-         
+        const response = await fetch(DEFAULT_CONFIG.DATA_SOURCE_CHUVA_POR_CIDADE);
         if (!response.ok) throw new Error(`Erro HTTP! status: ${response.status}`);
 
         const cidadesData = await response.json();
-        const labels = cidadesData.map(item => item.cidade);
-        // Agora usamos a mediana em vez da média
-        const values = cidadesData.map(item => item.chuvaMediana);
 
-        const novoDataset = JSON.stringify({ labels, values });
+        // 🔹 Filtra cidades com dados válidos para manter consistência (usando média)
+        const cidadesValidas = cidadesData
+            .filter(item => item.chuvaMedia !== null && item.chuvaMedia > 0)
+            .map((item, index) => ({
+                index: index + 1,
+                cidade: item.cidade,
+                chuvaMedia: item.chuvaMedia
+            }));
+
+        // 🔄 Verifica se os dados mudaram para evitar re-renderizações desnecessárias
+        const novoDataset = JSON.stringify({ 
+            labels: cidadesValidas.map(c => c.cidade), 
+            values: cidadesValidas.map(c => c.chuvaMedia) 
+        });
         if (ultimoDataset === novoDataset) {
-            // console.log('Os dados não mudaram, gráfico não atualizado.');
+            console.log("⏳ [DEBUG] Dados não mudaram, gráfico não atualizado.");
             return;
         }
         ultimoDataset = novoDataset;
 
+        // 🔄 Destroi o gráfico anterior antes de criar um novo
         if (chartInstance) {
             chartInstance.destroy();
             chartInstance = null;
         }
 
-        // 🔄 Agora chama o gráfico vertical usando a mediana
+        // 🔄 Renderiza o gráfico vertical atualizado com os valores da média
         chartInstance = renderVerticalBarChart('myChart', {
-            labels,
-            values,
-            label: 'Mediana de Chuva (mm)', // Atualiza o label para refletir a mediana
+            labels: cidadesValidas.map(c => c.cidade),
+            values: cidadesValidas.map(c => c.chuvaMedia),
+            label: 'Média de Chuva (mm)',
             backgroundColor: 'rgba(64, 188, 255, 0.85)',
             borderColor: 'rgb(29, 143, 237)',
-            title: 'Mediana de Chuva por Cidade'
+            title: 'Média de Chuva por Cidade'
         });
 
-        // console.log('Gráfico de mediana de chuvas atualizado.');
+        console.log("✅ [DEBUG] Gráfico de chuva atualizado com sucesso!");
     } catch (error) {
-        console.error('Erro ao carregar dados para o gráfico:', error);
+        console.error('❌ [DEBUG] Erro ao carregar dados para o gráfico:', error);
     }
 }
+

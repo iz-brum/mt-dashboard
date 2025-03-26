@@ -1,5 +1,5 @@
 /**
- * @file src/components/importControl.js
+ * @file src/components/controleImportacao.js
  * @description Módulo responsável por configurar o controle de importação de arquivos no mapa.
  * Esse controle exibe um botão no mapa que, ao ser clicado, abre um modal para seleção e upload de arquivos,
  * os quais serão renderizados no mapa.
@@ -17,6 +17,13 @@ import { importFiles, renderFileOnMap } from '#components/gerenciadorArquivos.js
  * @param {L.Control.Layers} layerControl - Controle de camadas do mapa (utilizado para renderizar os arquivos importados).
  */
 export function setupImportControl(map, layerControl) {
+    if (!layerControl || typeof layerControl.addOverlay !== 'function') {
+        console.error('Erro: layerControl não foi passado corretamente para setupImportControl.');
+        return;
+    }
+
+    // console.log('layerControl recebido corretamente em setupImportControl:', layerControl);
+
     // Cria um novo controle estendendo L.Control para o botão de importação
     const ImportControl = L.Control.extend({
         options: { position: 'topleft' }, // Define a posição do controle no canto superior esquerdo

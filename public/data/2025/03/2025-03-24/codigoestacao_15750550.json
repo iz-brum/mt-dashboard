@@ -1,0 +1,966 @@
+{
+    "codigoestacao": "15750550",
+    "data": "2025-03-24",
+    "dados": [
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21380.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 00:31:01.827",
+            "Data_Hora_Medicao": "2025-03-24 00:00:00.0",
+            "Vazao_Adotada": "684.56",
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21380.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 02:45:10.823",
+            "Data_Hora_Medicao": "2025-03-24 00:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21380.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 03:00:16.35",
+            "Data_Hora_Medicao": "2025-03-24 00:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21380.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 03:15:10.733",
+            "Data_Hora_Medicao": "2025-03-24 00:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21380.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 01:31:23.76",
+            "Data_Hora_Medicao": "2025-03-24 01:00:00.0",
+            "Vazao_Adotada": "681.31",
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 03:45:12.9",
+            "Data_Hora_Medicao": "2025-03-24 01:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 04:00:17.877",
+            "Data_Hora_Medicao": "2025-03-24 01:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 04:15:10.19",
+            "Data_Hora_Medicao": "2025-03-24 01:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 02:30:59.24",
+            "Data_Hora_Medicao": "2025-03-24 02:00:00.0",
+            "Vazao_Adotada": "679.69",
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21380.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 04:45:10.5",
+            "Data_Hora_Medicao": "2025-03-24 02:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 05:00:28.35",
+            "Data_Hora_Medicao": "2025-03-24 02:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 05:15:10.31",
+            "Data_Hora_Medicao": "2025-03-24 02:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 03:30:59.1",
+            "Data_Hora_Medicao": "2025-03-24 03:00:00.0",
+            "Vazao_Adotada": "677.26",
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 05:45:10.833",
+            "Data_Hora_Medicao": "2025-03-24 03:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 06:00:27.953",
+            "Data_Hora_Medicao": "2025-03-24 03:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 06:15:15.01",
+            "Data_Hora_Medicao": "2025-03-24 03:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 04:30:53.287",
+            "Data_Hora_Medicao": "2025-03-24 04:00:00.0",
+            "Vazao_Adotada": "676.45",
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 06:45:09.633",
+            "Data_Hora_Medicao": "2025-03-24 04:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 07:00:55.24",
+            "Data_Hora_Medicao": "2025-03-24 04:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 07:15:10.58",
+            "Data_Hora_Medicao": "2025-03-24 04:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 05:30:48.433",
+            "Data_Hora_Medicao": "2025-03-24 05:00:00.0",
+            "Vazao_Adotada": "674.02",
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 07:45:10.633",
+            "Data_Hora_Medicao": "2025-03-24 05:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 08:00:15.757",
+            "Data_Hora_Medicao": "2025-03-24 05:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 08:15:11.777",
+            "Data_Hora_Medicao": "2025-03-24 05:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 06:30:53.07",
+            "Data_Hora_Medicao": "2025-03-24 06:00:00.0",
+            "Vazao_Adotada": "672.41",
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 08:45:12.04",
+            "Data_Hora_Medicao": "2025-03-24 06:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 09:00:14.473",
+            "Data_Hora_Medicao": "2025-03-24 06:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 09:15:13.84",
+            "Data_Hora_Medicao": "2025-03-24 06:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 07:30:54.523",
+            "Data_Hora_Medicao": "2025-03-24 07:00:00.0",
+            "Vazao_Adotada": "669.99",
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 09:45:09.607",
+            "Data_Hora_Medicao": "2025-03-24 07:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 10:00:19.297",
+            "Data_Hora_Medicao": "2025-03-24 07:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 10:15:13.023",
+            "Data_Hora_Medicao": "2025-03-24 07:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 08:30:54.63",
+            "Data_Hora_Medicao": "2025-03-24 08:00:00.0",
+            "Vazao_Adotada": "669.99",
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 10:45:09.847",
+            "Data_Hora_Medicao": "2025-03-24 08:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 11:00:18.6",
+            "Data_Hora_Medicao": "2025-03-24 08:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 11:15:17.363",
+            "Data_Hora_Medicao": "2025-03-24 08:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 09:30:55.023",
+            "Data_Hora_Medicao": "2025-03-24 09:00:00.0",
+            "Vazao_Adotada": "669.18",
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 11:45:12.037",
+            "Data_Hora_Medicao": "2025-03-24 09:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 12:00:19.553",
+            "Data_Hora_Medicao": "2025-03-24 09:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 12:15:11.15",
+            "Data_Hora_Medicao": "2025-03-24 09:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 10:31:12.63",
+            "Data_Hora_Medicao": "2025-03-24 10:00:00.0",
+            "Vazao_Adotada": "668.38",
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21386.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 12:45:09.673",
+            "Data_Hora_Medicao": "2025-03-24 10:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21386.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 13:00:15.643",
+            "Data_Hora_Medicao": "2025-03-24 10:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21386.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 13:15:10.61",
+            "Data_Hora_Medicao": "2025-03-24 10:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21386.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 13:30:31.28",
+            "Data_Hora_Medicao": "2025-03-24 11:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21386.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 13:45:10.293",
+            "Data_Hora_Medicao": "2025-03-24 11:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21386.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 14:00:16.08",
+            "Data_Hora_Medicao": "2025-03-24 11:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21386.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 14:15:09.81",
+            "Data_Hora_Medicao": "2025-03-24 11:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21395.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 14:30:31.803",
+            "Data_Hora_Medicao": "2025-03-24 12:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21392.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 14:45:09.837",
+            "Data_Hora_Medicao": "2025-03-24 12:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21392.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 15:00:16.67",
+            "Data_Hora_Medicao": "2025-03-24 12:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21392.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 15:15:11.29",
+            "Data_Hora_Medicao": "2025-03-24 12:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21377.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 15:30:27.163",
+            "Data_Hora_Medicao": "2025-03-24 13:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21380.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 15:45:10.977",
+            "Data_Hora_Medicao": "2025-03-24 13:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 16:00:15.343",
+            "Data_Hora_Medicao": "2025-03-24 13:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 16:15:11.227",
+            "Data_Hora_Medicao": "2025-03-24 13:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 16:30:32.117",
+            "Data_Hora_Medicao": "2025-03-24 14:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 16:45:11.02",
+            "Data_Hora_Medicao": "2025-03-24 14:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 17:00:16.72",
+            "Data_Hora_Medicao": "2025-03-24 14:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 17:15:10.91",
+            "Data_Hora_Medicao": "2025-03-24 14:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 17:30:31.0",
+            "Data_Hora_Medicao": "2025-03-24 15:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 17:45:09.777",
+            "Data_Hora_Medicao": "2025-03-24 15:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "3.40",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 18:00:18.777",
+            "Data_Hora_Medicao": "2025-03-24 15:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "4.80",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 18:15:11.867",
+            "Data_Hora_Medicao": "2025-03-24 15:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "1.40",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 18:30:30.007",
+            "Data_Hora_Medicao": "2025-03-24 16:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.60",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 18:45:11.31",
+            "Data_Hora_Medicao": "2025-03-24 16:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.40",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 19:00:15.913",
+            "Data_Hora_Medicao": "2025-03-24 16:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.20",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 19:15:12.423",
+            "Data_Hora_Medicao": "2025-03-24 16:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.40",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 19:30:29.74",
+            "Data_Hora_Medicao": "2025-03-24 17:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 19:45:12.66",
+            "Data_Hora_Medicao": "2025-03-24 17:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 20:00:17.3",
+            "Data_Hora_Medicao": "2025-03-24 17:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21379.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 20:15:11.247",
+            "Data_Hora_Medicao": "2025-03-24 17:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 20:30:27.637",
+            "Data_Hora_Medicao": "2025-03-24 18:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 20:45:11.33",
+            "Data_Hora_Medicao": "2025-03-24 18:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.20",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 21:00:17.68",
+            "Data_Hora_Medicao": "2025-03-24 18:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.80",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 21:15:11.7",
+            "Data_Hora_Medicao": "2025-03-24 18:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.20",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 21:30:33.2",
+            "Data_Hora_Medicao": "2025-03-24 19:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 21:45:09.6",
+            "Data_Hora_Medicao": "2025-03-24 19:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 22:00:16.79",
+            "Data_Hora_Medicao": "2025-03-24 19:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 22:15:09.557",
+            "Data_Hora_Medicao": "2025-03-24 19:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 22:30:31.05",
+            "Data_Hora_Medicao": "2025-03-24 20:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 22:45:09.423",
+            "Data_Hora_Medicao": "2025-03-24 20:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.20",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 23:00:16.043",
+            "Data_Hora_Medicao": "2025-03-24 20:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 23:15:29.67",
+            "Data_Hora_Medicao": "2025-03-24 20:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 23:31:31.823",
+            "Data_Hora_Medicao": "2025-03-24 21:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21377.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-24 23:45:09.43",
+            "Data_Hora_Medicao": "2025-03-24 21:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21377.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-25 00:00:20.107",
+            "Data_Hora_Medicao": "2025-03-24 21:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-25 00:15:21.763",
+            "Data_Hora_Medicao": "2025-03-24 21:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-25 00:32:31.353",
+            "Data_Hora_Medicao": "2025-03-24 22:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-25 00:45:38.06",
+            "Data_Hora_Medicao": "2025-03-24 22:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-25 01:00:29.483",
+            "Data_Hora_Medicao": "2025-03-24 22:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21377.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-25 01:15:19.107",
+            "Data_Hora_Medicao": "2025-03-24 22:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-25 01:30:34.843",
+            "Data_Hora_Medicao": "2025-03-24 23:00:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-25 01:45:11.407",
+            "Data_Hora_Medicao": "2025-03-24 23:15:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21378.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-25 02:00:15.48",
+            "Data_Hora_Medicao": "2025-03-24 23:30:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        },
+        {
+            "Chuva_Adotada": "0.00",
+            "Chuva_Adotada_Status": "0",
+            "Cota_Adotada": "21377.00",
+            "Cota_Adotada_Status": "0",
+            "Data_Atualizacao": "2025-03-25 02:15:10.5",
+            "Data_Hora_Medicao": "2025-03-24 23:45:00.0",
+            "Vazao_Adotada": null,
+            "Vazao_Adotada_Status": "0"
+        }
+    ]
+}

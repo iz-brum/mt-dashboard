@@ -12,7 +12,6 @@ import { mergeStationData } from '#apis/ana/services/node/mesclarDadosEstacoes.j
 import { categorizeStations, categorizeStation } from '#utils/ana/classification/categorizacaoEstacoes.js'; // Funções para categorizar as estações
 import { getHistoricalStationData } from '#apis/ana/services/node/historicalStationData.js';
 
-
 const router = express.Router();
 
 router.get('/estacoes/categorizadas', async (req, res) => {
@@ -124,18 +123,17 @@ router.get('/estacoes/todas', async (req, res) => {
   }
 });
 
-
 /**
  * GET /estacoes/historico/:dateStr/:intervaloh/:stationCode?
- * Retorna o histórico dos dados de cada estação para o intervalo especificado (ex.: "2h", "6h", "12h" ou "24h")
+ * Retorna o histórico dos dados de cada estação para o intervalo especificado (ex.: "2h", "6h", "12h", "24h" ou "48h")
  * e para a data informada (formato "YYYY-MM-DD"). Se o stationCode for informado, retorna somente os dados daquela estação.
  */
 router.get('/estacoes/historico/:dateStr/:intervaloh/:stationCode?', async (req, res) => {
   try {
     const { dateStr, intervaloh, stationCode } = req.params;
     const intValue = Number(intervaloh.replace('h', ''));
-    if (![2, 6, 12, 24].includes(intValue)) {
-      return res.status(400).json({ error: "Intervalo inválido. Os valores permitidos são 2h, 6h, 12h e 24h." });
+    if (![2, 6, 12, 24, 48].includes(intValue)) {
+      return res.status(400).json({ error: "Intervalo inválido. Os valores permitidos são 2h, 6h, 12h, 24h e 48h." });
     }
     const historicalData = await getHistoricalStationData(intValue, dateStr);
     if (stationCode) {
@@ -151,7 +149,6 @@ router.get('/estacoes/historico/:dateStr/:intervaloh/:stationCode?', async (req,
     res.status(500).json({ error: "Falha ao obter o histórico das estações." });
   }
 });
-
 
 /**
  * GET /estacoes/chuvaPorCidade

@@ -3,6 +3,8 @@
  * @description Módulo para criação e configuração das camadas base do mapa.
  */
 
+import { renderFileOnMap } from '#components/gerenciadorArquivos.js';
+
 // Configuração das camadas base utilizando diversas fontes
 const BASE_LAYERS_CONFIG = {
     'OpenStreetMap': {
@@ -115,5 +117,40 @@ export function createSatelliteLayer() {
     return createLayerGroup([base, labels, reference]);
 }
 
+/**
+ * Carrega vários arquivos locais (kml, kmz, geojson...) via fetch
+ * e chama `renderFileOnMap` para que cada um seja interpretado do mesmo jeito que o upload faria.
+ *
+ * @param {string[]} urls - Array com os caminhos dos arquivos (ex: ['assets/dce-mt.kml', 'assets/outro.kml']).
+ * @param {L.Map} map - Instância do Leaflet Map.
+ * @param {Object} layerControl - Seu controle de camadas (opcional).
+ */
+async function addLocalAssetsThroughImporter(urls, map, layerControl) {
+    // Cria um array de promessas para processar todos os arquivos
+    const promises = urls.map(async (url) => {
+        const fileName = url.split('/').pop();
+        const extension = fileName.split('.').pop().toLowerCase();
 
-export { DEFAULT_LAYER_NAME };
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Falha ao carregar ${url}: status ${response.status}`);
+        }
+
+        let file;
+        if (extension === 'kmz') {
+            const arrayBuffer = await response.arrayBuffer();
+            file = new File([arrayBuffer], fileName, { type: 'application/vnd.google-earth.kmz' });
+        } else {
+            const text = await response.text();
+            file = new File([text], fileName, { type: 'text/xml' });
+        }
+
+        return renderFileOnMap(file, map, layerControl);
+    });
+
+    // Aguarda que todos os arquivos sejam processados
+    await Promise.all(promises);
+}
+
+
+export { DEFAULT_LAYER_NAME, addLocalAssetsThroughImporter };

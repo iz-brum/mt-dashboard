@@ -1,19 +1,11 @@
+// FILE: src/components/gerenciadorArquivos.js
+
+import JSZip from 'jszip';
+import { refreshOverlays, applyOverlayStyles } from '#components/layers/controleCamadas.js';
+
 /**
- * @file src\components\fileHandler.js
- * 
- * @module fileHandler
  * Módulo de importação e visualização de arquivos no mapa (Refatorado).
  */
-
-// Constantes para ícones e caminhos
-const ICON_BASE_PATH = 'assets/icons/'; // Caminho base para os ícones dos arquivos
-const FILE_TYPE_ICONS = {
-    geojson: 'geojson.png', // Ícone para arquivos GeoJSON
-    json: 'json.png',       // Ícone para arquivos JSON
-    kml: 'kml.png',         // Ícone para arquivos KML
-    gpx: 'gpx.png',         // Ícone para arquivos GPX
-    default: 'file.png'     // Ícone padrão para formatos não reconhecidos
-};
 
 /**
  * @typedef {Object} FileImportConfig
@@ -39,32 +31,24 @@ export function importFiles(config) {
         skipDuplicates = true
     } = config;
 
-    // Se nenhum arquivo foi selecionado, loga a informação e encerra a função.
     if (!files || files.length === 0) {
         console.log('Nenhum arquivo selecionado ou importação cancelada.');
         return;
     }
 
-    // Converte a FileList para Array e processa cada arquivo
     Array.from(files).forEach(file => {
-        // Verifica duplicidade se a opção skipDuplicates estiver ativa
         if (skipDuplicates && isDuplicate(file, uploadedFiles)) {
-            console.warn(`O arquivo ${file.name} já foi importado. Ignorando duplicata.`);
+            alert(`O arquivo ${file.name} já foi importado. Ignorando duplicata.`);
             return;
         }
 
-        // Cria o elemento de lista (DOM) para representar o arquivo e o adiciona ao elemento fileListElement
         const fileItemElement = createFileItemElement(file, confirmButton, uploadedFiles);
         fileListElement.appendChild(fileItemElement);
 
-        // Cria um FileReader para ler o conteúdo do arquivo e exibir o progresso
         const reader = new FileReader();
-        // Seleciona a barra de progresso contida no elemento do arquivo
         const progressBar = fileItemElement.querySelector('.file-progress');
 
-        // Configura os eventos do FileReader para atualizar a barra de progresso e armazenar o arquivo
         setupFileReaderEvents(reader, file, progressBar, confirmButton, uploadedFiles);
-        // Inicia a leitura do arquivo como texto
         reader.readAsText(file);
     });
 }
@@ -85,7 +69,6 @@ function isDuplicate(newFile, uploadedFiles) {
 
 /**
  * Cria o elemento de lista (DOM) para representar um arquivo.
- * O elemento inclui o nome do arquivo, uma barra de progresso, o tamanho formatado e um botão para excluir.
  *
  * @param {File} file - Arquivo a ser exibido.
  * @param {HTMLButtonElement} confirmButton - Botão de confirmação de upload.
@@ -95,21 +78,16 @@ function isDuplicate(newFile, uploadedFiles) {
 function createFileItemElement(file, confirmButton, uploadedFiles) {
     const fileItem = document.createElement('div');
     fileItem.classList.add('file-item');
-
-    // Define o conteúdo HTML do item com o nome do arquivo, barra de progresso, tamanho e botão de exclusão
     fileItem.innerHTML = `
       <span class="file-name">${file.name}</span>
       <progress class="file-progress" value="0" max="100"></progress>
       <span class="file-size">${formatFileSize(file.size)}</span>
       <button class="delete-file-btn">Excluir</button>
     `;
-
-    // Adiciona um listener ao botão de exclusão para remover o arquivo da lista e do array
     const deleteButton = fileItem.querySelector('.delete-file-btn');
     deleteButton.addEventListener('click', () => {
         removeUploadedFile(fileItem, file, uploadedFiles, confirmButton);
     });
-
     return fileItem;
 }
 
@@ -123,18 +101,15 @@ function createFileItemElement(file, confirmButton, uploadedFiles) {
  * @param {File[]} uploadedFiles - Lista de arquivos já carregados.
  */
 function setupFileReaderEvents(reader, file, progressBar, confirmButton, uploadedFiles) {
-    // Em caso de erro na leitura do arquivo, exibe uma mensagem de erro e alerta o usuário
     reader.onerror = () => {
         console.error(`Erro ao ler o arquivo: ${file.name}`);
         alert('Erro ao ler o arquivo. Tente novamente.');
     };
 
-    // Inicializa a barra de progresso no início da leitura
     reader.onloadstart = () => {
         progressBar.value = 0;
     };
 
-    // Atualiza a barra de progresso conforme o arquivo é lido
     reader.onprogress = event => {
         if (event.lengthComputable) {
             const percentage = (event.loaded / event.total) * 100;
@@ -142,7 +117,6 @@ function setupFileReaderEvents(reader, file, progressBar, confirmButton, uploade
         }
     };
 
-    // Quando a leitura é concluída, adiciona o arquivo à lista e exibe o botão de confirmação
     reader.onload = () => {
         uploadedFiles.push(file);
         confirmButton.style.display = 'block';
@@ -162,7 +136,6 @@ function formatFileSize(size) {
 
 /**
  * Remove o item do arquivo da lista exibida e do array de arquivos carregados.
- * Ajusta a visibilidade do botão "OK" se não houver mais arquivos na lista.
  *
  * @param {HTMLDivElement} fileItemElement - Elemento do DOM representando o arquivo na lista.
  * @param {File} file - Arquivo a ser removido.
@@ -170,113 +143,135 @@ function formatFileSize(size) {
  * @param {HTMLButtonElement} confirmButton - Botão de confirmação de upload.
  */
 export function removeUploadedFile(fileItemElement, file, uploadedFiles, confirmButton) {
-    // Remove o elemento do DOM
     fileItemElement.remove();
-
-    // Encontra o índice do arquivo no array e o remove
     const fileIndex = uploadedFiles.indexOf(file);
     if (fileIndex !== -1) {
         uploadedFiles.splice(fileIndex, 1);
     }
-
-    // Se não houver mais arquivos, oculta o botão de confirmação
     if (uploadedFiles.length === 0) {
         confirmButton.style.display = 'none';
     }
 }
 
 /**
- * Adiciona um arquivo ao mapa de acordo com sua extensão (JSON, GEOJSON, KML ou GPX).
- * Lê o arquivo usando FileReader e, quando a leitura é concluída, cria uma camada a partir do seu conteúdo.
+ * Adiciona um arquivo ao mapa de acordo com sua extensão.
  *
  * @param {File} file - Arquivo a ser adicionado ao mapa.
  * @param {L.Map} map - Instância do Leaflet Map.
- * @param {L.Control.Layer} [layerControl] - Controle de camadas (opcional) para adicionar a camada.
+ * @param {L.Control.Layer} [layerControl] - Controle de camadas (opcional).
  */
-export function renderFileOnMap(file, map, layerControl) {
-    // Extrai a extensão do arquivo
+export async function renderFileOnMap(file, map, layerControl) {
     const fileExtension = extractFileExtension(file.name);
     const reader = new FileReader();
 
-    reader.onload = event => {
+    reader.onload = async event => {
         try {
-            // Obtém o conteúdo do arquivo
             const content = event.target.result;
-            // Cria uma camada a partir do conteúdo e da extensão
-            const layer = createLayerFromContent(content, fileExtension);
+            console.log(`Conteúdo do arquivo ${file.name}:`, content);
 
-            if (!layer) {
+            // Se for KML simples, parseia o XML
+            let xmlDoc = null;
+            if (fileExtension === 'kml') {
+                xmlDoc = parseKMLString(content);
+            }
+
+            // Cria a camada principal (p.ex. via omnivore)
+            let mainLayer = createLayerFromContent(content, fileExtension);
+            if (mainLayer instanceof Promise) {
+                mainLayer = await mainLayer;
+            }
+
+            // Se mainLayer é null e o arquivo for PNG, simplesmente ignora
+            if (!mainLayer && fileExtension === 'png') {
+                console.warn("Arquivo PNG ignorado, pois não é camada geoespacial.");
+                return;
+            }
+            // Se mainLayer é null para outros formatos, lança erro
+            if (!mainLayer) {
                 throw new Error('Falha ao criar camada a partir do arquivo.');
             }
-            // Adiciona a camada ao mapa e ao controle de camadas (se fornecido)
-            addLayerToMap(layer, map, file, layerControl);
+
+            // Se for KML, vamos extrair também os Placemarks com ícone customizado
+            let placemarkGroup = null;
+            if (xmlDoc) {
+                placemarkGroup = await parsePlacemarks(xmlDoc, null);
+            }
+
+            // Combina a camada principal + placemarks num layerGroup final
+            const combinedGroup = L.layerGroup();
+            combinedGroup.addLayer(mainLayer);
+            if (placemarkGroup) {
+                combinedGroup.addLayer(placemarkGroup);
+            }
+
+            // Cria a entrada no controle de camadas
+            const fileKey = file.name.substring(0, file.name.lastIndexOf('.'));
+            const newOverlay = { [fileKey]: combinedGroup };
+            refreshOverlays(map, newOverlay);
 
         } catch (error) {
             console.error(`Erro ao processar arquivo ${file.name}:`, error);
             alert(`Erro ao processar arquivo ${file.name}. Verifique o console para mais detalhes.`);
-            // DEBUG:
-            // Erro ao processar arquivo br_mt.json: TypeError: layerControl.addOverlay is not a function
-            // at addLayerToMap (fileHandler.js:258:22)
-            // at reader.onload (fileHandler.js:187:13)
         }
     };
 
-    // Inicia a leitura do arquivo como texto
-    reader.readAsText(file);
+    if (fileExtension === 'kmz') {
+        reader.readAsArrayBuffer(file);
+    } else {
+        reader.readAsText(file);
+    }
 }
 
 /**
- * Função auxiliar que extrai o nome e a extensão do arquivo.
+ * Função auxiliar que extrai a extensão do arquivo a partir do nome.
  *
  * @param {string} fileName - Nome completo do arquivo.
- * @returns {Object} Objeto contendo 'name' (nome do arquivo sem extensão) e 'extension' (extensão em minúsculas).
- */
-const getFileNameParts = (fileName) => {
-    const lastDotIndex = fileName.lastIndexOf('.');
-    return {
-        name: fileName.substring(0, lastDotIndex),
-        extension: fileName.substring(lastDotIndex + 1).toLowerCase()
-    };
-};
-
-/**
- * Cria um HTML para exibir o nome da camada, incluindo um ícone correspondente à extensão do arquivo.
- *
- * @param {string} fileName - Nome do arquivo.
- * @returns {string} HTML contendo o nome da camada e o ícone.
- */
-const createLayerNameHTML = (fileName) => {
-    const { name, extension } = getFileNameParts(fileName);
-    const iconFile = FILE_TYPE_ICONS[extension] || FILE_TYPE_ICONS.default;
-
-    return `
-        <span class="layer-name">
-            <img src="${ICON_BASE_PATH}${iconFile}" 
-                 alt="${extension}" 
-                 class="layer-icon"
-                 title="Tipo de arquivo: ${extension}">
-            ${name}
-        </span>
-    `;
-};
-
-/**
- * Extrai a extensão do arquivo a partir do nome.
- *
- * @param {string} fileName - Nome completo do arquivo.
- * @returns {string} Extensão do arquivo em letras minúsculas.
+ * @returns {string} Extensão em minúsculas.
  */
 function extractFileExtension(fileName) {
     return fileName.split('.').pop().toLowerCase();
 }
 
+function parseGroundOverlay(xmlDoc, zip) {
+    const groundOverlay = xmlDoc.getElementsByTagName("GroundOverlay")[0];
+    if (!groundOverlay) return null;
+
+    const iconElem = groundOverlay.getElementsByTagName("Icon")[0];
+    const hrefElem = iconElem ? iconElem.getElementsByTagName("href")[0] : null;
+    if (!hrefElem) {
+        throw new Error("GroundOverlay não contém um href válido.");
+    }
+    const iconHref = hrefElem.textContent.trim();
+
+    const north = parseFloat(groundOverlay.getElementsByTagName("north")[0].textContent);
+    const south = parseFloat(groundOverlay.getElementsByTagName("south")[0].textContent);
+    const east = parseFloat(groundOverlay.getElementsByTagName("east")[0].textContent);
+    const west = parseFloat(groundOverlay.getElementsByTagName("west")[0].textContent);
+    const bounds = [[south, west], [north, east]];
+
+    if (iconHref.startsWith("files/")) {
+        const imageFileName = iconHref.replace(/^files\//, "");
+        const zipEntry = zip.file(`files/${imageFileName}`);
+        if (!zipEntry) {
+            console.warn(`Arquivo de imagem ${iconHref} não encontrado no KMZ.`);
+            return null;
+        }
+        return zipEntry.async("blob").then(blob => {
+            const imageUrl = URL.createObjectURL(blob);
+            return L.imageOverlay(imageUrl, bounds);
+        });
+    } else {
+        console.warn(`GroundOverlay aponta para ${iconHref}, que não está dentro do KMZ.`);
+        return L.imageOverlay(iconHref, bounds);
+    }
+}
+
 /**
  * Cria uma camada Leaflet a partir do conteúdo do arquivo, de acordo com sua extensão.
- * Suporta os formatos JSON/GeoJSON, KML e GPX.
  *
  * @param {string} content - Conteúdo do arquivo.
- * @param {string} extension - Extensão do arquivo (ex.: "json", "kml", etc.).
- * @returns {L.Layer} Camada Leaflet criada a partir do conteúdo.
+ * @param {string} extension - Extensão do arquivo.
+ * @returns {L.Layer} Camada Leaflet.
  */
 function createLayerFromContent(content, extension) {
     switch (extension) {
@@ -291,36 +286,308 @@ function createLayerFromContent(content, extension) {
             if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
                 throw new Error('KML inválido ou mal formatado');
             }
-            return omnivore.kml.parse(content);
+
+            // Aqui, sobrescrevemos a forma de ponto para não exibir o ícone default
+            const optionsGeoJson = L.geoJson(null, {
+                pointToLayer: (feature, latlng) => {
+                    // Retorna um círculo sem raio e sem cor (invisível)
+                    return L.circleMarker(latlng, {
+                        radius: 0,
+                        opacity: 0,
+                        fillOpacity: 0
+                    });
+                }
+            });
+
+            return omnivore.kml.parse(content, null, optionsGeoJson);
         }
         case 'gpx':
             return new L.GPX(content);
+        case 'kmz': {
+            return (async () => {
+                const zip = await JSZip.loadAsync(content);
+                const kmlFileName = Object.keys(zip.files).find(name =>
+                    name.toLowerCase().endsWith('.kml')
+                );
+                if (!kmlFileName) {
+                    throw new Error("KMZ file does not contain a KML file.");
+                }
+                const kmlContent = await zip.file(kmlFileName).async("string");
+                console.log("KML extraído do KMZ:", kmlContent);
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(kmlContent, 'text/xml');
+                if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
+                    throw new Error("KML inválido ou mal formatado");
+                }
+
+                if (xmlDoc.getElementsByTagName("GroundOverlay").length > 0) {
+                    const result = parseGroundOverlay(xmlDoc, zip);
+                    if (result instanceof Promise) {
+                        return result;
+                    }
+                    return result;
+                }
+
+                return new Promise((resolve, reject) => {
+                    const layer = omnivore.kml.parse(kmlContent);
+                    layer.on('ready', () => resolve(layer));
+                    layer.on('error', err => reject(err));
+                });
+            })();
+        }
+        case 'png': {
+            // Se quiser simplesmente ignorar:
+            alert("Arquivo PNG não é carregado como camada geoespacial. Ignorando...");
+            return null; // Retorna nulo ou algo que não quebre o fluxo
+        }
         default:
             throw new Error(`Formato de arquivo não suportado: ${extension}`);
     }
 }
 
-/**
- * Adiciona uma camada ao mapa e, se fornecido, ao controle de camadas.
- * Após adicionar a camada ao mapa, ajusta o zoom do mapa para os limites da camada, se possível.
- *
- * @param {L.Layer} layer - Camada criada a partir do arquivo.
- * @param {L.Map} map - Instância do mapa Leaflet.
- * @param {File} file - Arquivo que originou a camada.
- * @param {L.Control.Layer} [layerControl] - Controle de camadas (opcional).
- */
-function addLayerToMap(layer, map, file, layerControl) {
-    // Adiciona a camada ao mapa
-    layer.addTo(map);
+function parseKMLString(kmlString) {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(kmlString, 'text/xml');
+    if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
+        throw new Error('KML inválido ou mal formatado');
+    }
+    return xmlDoc;
+}
 
-    // Quando a camada estiver pronta, ajusta o zoom do mapa para se adequar aos limites da camada
-    layer.on('ready', function () {
-        this.getBounds && map.fitBounds(this.getBounds());
+// Ajuste em parsePlacemarks para passar xmlDoc como parâmetro:
+// MODIFICAÇÃO EM parsePlacemarks:
+async function parsePlacemarks(xmlDoc, zip = null) {
+    const placemarks = xmlDoc.getElementsByTagName('Placemark');
+    const layers = [];
+
+    for (let i = 0; i < placemarks.length; i++) {
+        const placemarkElem = placemarks[i];
+        // Agora passamos xmlDoc como terceiro parâmetro
+        const layerOrPromise = parseSinglePlacemark(placemarkElem, zip, xmlDoc);
+        layers.push(layerOrPromise);
+    }
+
+    // Espera todos os Promises e filtra nulos
+    const results = await Promise.all(layers);
+    const validMarkers = results.filter(Boolean);
+
+    // Agrupa tudo num LayerGroup
+    const placemarkGroup = L.layerGroup(validMarkers);
+    return placemarkGroup;
+}
+
+function parseSinglePlacemark(placemarkElem, zip, xmlDoc) {
+    // 1) Verifica se existe <Point> e <coordinates> (caso seja polígono, ignoramos).
+    const pointElem = placemarkElem.getElementsByTagName('Point')[0];
+    if (!pointElem) return null;
+
+    const coordsElem = pointElem.getElementsByTagName('coordinates')[0];
+    if (!coordsElem) return null;
+    const coordsText = coordsElem.textContent.trim();
+    const [lng, lat] = coordsText.split(',').map(parseFloat);
+
+    // 2) Captura o <name> para usar como rótulo
+    const nameElem = placemarkElem.getElementsByTagName('name')[0];
+    let labelText = '';
+    if (nameElem) {
+      labelText = nameElem.textContent.trim();
+    }
+
+    // 3) Verifica <gx:Carousel> para imagem do Google Earth
+    const carouselHref = getCarouselImageUrl(placemarkElem);
+
+    // 4) Verifica se há <styleUrl> e extrai IconStyle
+    let styleHref = null;
+    let styleScale = 1.0;
+    const styleUrlElem = placemarkElem.getElementsByTagName('styleUrl')[0];
+    if (styleUrlElem) {
+        let styleUrl = styleUrlElem.textContent.trim();
+        if (styleUrl.startsWith('#')) {
+            styleUrl = styleUrl.substring(1);
+        }
+        const styleOrMapElem = findStyleOrStyleMap(xmlDoc, styleUrl);
+        if (styleOrMapElem) {
+            const { href, scale } = extractIconStyle(styleOrMapElem, xmlDoc);
+            styleHref = href;
+            styleScale = scale;
+        }
+    }
+
+    // 5) Decide qual URL de ícone usar (o do style ou do <gx:Carousel>)
+    let iconHref = null;
+    let iconScale = 1.0;
+
+    if (styleHref && styleHref !== 'default.png') {
+        iconHref = styleHref;
+        iconScale = styleScale;
+    } else if (carouselHref) {
+        iconHref = carouselHref;
+        iconScale = 1.2;  // se quiser aumentar
+    } else {
+        iconHref = 'default.png';
+    }
+
+    // 6) Se for KMZ + ícone interno "files/..." => extrai do zip
+    if (zip && iconHref.startsWith('files/')) {
+        return createMarkerFromKMZFile(iconHref, zip, lat, lng, iconScale)
+            .then(marker => {
+                // **Se tiver <name>, cria tooltip permanente**:
+                if (labelText) {
+                    marker.bindTooltip(labelText, {
+                        permanent: true,
+                        direction: 'top'
+                    });
+                }
+                return marker;
+            });
+    }
+
+    // 7) Se base64 inline => cria ícone base64
+    if (iconHref.startsWith('data:image/')) {
+        return createMarkerFromBase64(iconHref, lat, lng, iconScale)
+            .then(marker => {
+                if (labelText) {
+                    marker.bindTooltip(labelText, {
+                        permanent: true,
+                        direction: 'top'
+                    });
+                }
+                return marker;
+            });
+    }
+
+    // 8) Caso geral => cria marker normal
+    const marker = L.marker([lat, lng], {
+        icon: L.icon({
+            iconUrl: iconHref,
+            iconSize: [32 * iconScale, 32 * iconScale]
+        })
     });
 
-    // Se um controle de camadas foi fornecido, adiciona a camada a ele com um nome formatado
-    if (layerControl) {
-        const layerNameHTML = createLayerNameHTML(file.name);
-        layerControl.addOverlay(layer, layerNameHTML);
+    // **Se tiver <name>, adiciona tooltip permanente**:
+    if (labelText) {
+        marker.bindTooltip(labelText, {
+            permanent: true,
+            direction: 'top'
+        });
     }
+
+    return Promise.resolve(marker);
+}
+
+function findStyleOrStyleMap(xmlDoc, styleId) {
+    // 1) Tenta achar <Style id="styleId"> ou <StyleMap id="styleId">
+    let style = xmlDoc.querySelector(`Style[id="${styleId}"], Style[kml\\:id="${styleId}"]`);
+    if (style) return style;
+
+    let styleMap = xmlDoc.querySelector(`StyleMap[id="${styleId}"], StyleMap[kml\\:id="${styleId}"]`);
+    if (styleMap) return styleMap;
+
+    // 2) Se não achar, tenta <gx:CascadingStyle kml:id="styleId">
+    //    e pega o <Style> ou <StyleMap> que estiver dentro dele
+    let cascading = xmlDoc.querySelector(`gx\\:CascadingStyle[kml\\:id="${styleId}"]`);
+    if (cascading) {
+        // O <gx:CascadingStyle> deve conter um <Style> ou <StyleMap> como filho
+        let childStyle = cascading.querySelector('Style, StyleMap');
+        return childStyle || null;
+    }
+
+    // Nada encontrado
+    return null;
+}
+
+
+function extractIconStyle(styleElem, xmlDoc) {
+    if (!styleElem) return { href: null, scale: 1 };
+
+    if (styleElem.tagName === 'StyleMap') {
+        const pairElems = styleElem.getElementsByTagName('Pair');
+        for (let i = 0; i < pairElems.length; i++) {
+            const keyElem = pairElems[i].getElementsByTagName('key')[0];
+            if (keyElem && keyElem.textContent === 'normal') {
+                const innerStyleUrl = pairElems[i].getElementsByTagName('styleUrl')[0];
+                if (innerStyleUrl) {
+                    let innerId = innerStyleUrl.textContent.trim();
+                    if (innerId.startsWith('#')) innerId = innerId.substring(1);
+                    const realStyle = findStyleOrStyleMap(xmlDoc, innerId);
+                    return extractIconStyle(realStyle, xmlDoc);
+                }
+            }
+        }
+        return { href: null, scale: 1 };
+    }
+
+    const iconStyle = styleElem.getElementsByTagName('IconStyle')[0];
+    if (!iconStyle) return { href: null, scale: 1 };
+
+    let href = null;
+    let scale = 1.0;
+
+    const scaleElem = iconStyle.getElementsByTagName('scale')[0];
+    if (scaleElem) {
+        scale = parseFloat(scaleElem.textContent) || 1.0;
+    }
+
+    const iconElem = iconStyle.getElementsByTagName('Icon')[0];
+    if (iconElem) {
+        const hrefElem = iconElem.getElementsByTagName('href')[0];
+        if (hrefElem) {
+            href = hrefElem.textContent.trim();
+        }
+    }
+
+    return { href, scale };
+}
+
+function createMarkerFromBase64(base64Url, lat, lng, scale) {
+    return Promise.resolve(
+        L.marker([lat, lng], {
+            icon: L.icon({
+                iconUrl: base64Url,
+                iconSize: [32 * scale, 32 * scale]
+            })
+        })
+    );
+}
+
+function createMarkerFromKMZFile(iconHref, zip, lat, lng, scale) {
+    const entryName = iconHref.replace(/^files\//, '');
+    const zipEntry = zip.file(`files/${entryName}`);
+    if (!zipEntry) {
+        console.warn(`Imagem ${iconHref} não encontrada no KMZ.`);
+        return Promise.resolve(L.marker([lat, lng]));
+    }
+
+    return zipEntry.async('blob').then(blob => {
+        const imageUrl = URL.createObjectURL(blob);
+        return L.marker([lat, lng], {
+            icon: L.icon({
+                iconUrl: imageUrl,
+                iconSize: [32 * scale, 32 * scale]
+            })
+        });
+    });
+}
+
+function getCarouselImageUrl(placemarkElem) {
+    // Seleciona <gx:Carousel>
+    const carouselElem = placemarkElem.querySelector('gx\\:Carousel');
+    if (!carouselElem) return null;
+
+    // Seleciona <gx:Image>
+    const imageElem = carouselElem.querySelector('gx\\:Image');
+    if (!imageElem) return null;
+
+    // Seleciona <gx:imageUrl>
+    const imageUrlElem = imageElem.querySelector('gx\\:imageUrl');
+    if (!imageUrlElem) return null;
+
+    const imageUrl = imageUrlElem.textContent.trim();
+
+    // Adicione esta verificação para logar se for do earth.usercontent.google.com:
+    if (imageUrl.includes('earth.usercontent.google.com/hostedimage')) {
+        console.log('Encontrado <gx:imageUrl> do Earth:', imageUrl);
+    }
+
+    return imageUrl;
 }

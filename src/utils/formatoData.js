@@ -22,7 +22,7 @@
  * @returns {Date} Objeto Date correspondente ao timestamp em UTC.
  */
 
-import { DEFAULT_CONFIG } from '#utils/ana/config.js';
+import { DEFAULT_CONFIG } from '#utils/config.js';
 
 export const DataFormatter = {
     formatArea: (value) =>

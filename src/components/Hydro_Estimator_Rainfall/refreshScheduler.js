@@ -9,7 +9,7 @@
 import { refreshTimestamps } from '../../../server/apis/hydro_estimator_rainfall/services/apiManager.js';  // Função para atualizar os timestamps sem utilizar o cache
 // import { refreshTimestamps } from '../../../server/apis/hydro_estimator_rainfall/services/apiManager.js';
 
-import { convertTimestampToDate, formatTimestamp } from '../../utils/formatoData.js'; // Funções para converter e formatar timestamps
+import { convertTimestampToDate, formatTimestamp } from '#utils/formatoData.js'; // Funções para converter e formatar timestamps
 
 /**
  * Agenda a próxima atualização de timestamps.

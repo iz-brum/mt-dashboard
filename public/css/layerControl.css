@@ -195,10 +195,6 @@
 }
 
 
-
-
-/* ======================== */
-
 /* Exemplo de estilo para o controle de filtros */
 .filter-control {
     background: rgba(255, 255, 255, 0.9);
@@ -217,3 +213,11 @@
     display: block;
     margin-bottom: 4px;
 }
+
+.individual-clustering-toggle {
+    /* Altura desejada */
+    font-size: 24px;
+    color: #cd6804db;
+    margin-right: 5px;
+}
+

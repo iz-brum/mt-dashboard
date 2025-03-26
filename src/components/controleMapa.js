@@ -5,35 +5,19 @@
  * além de adicionar controles padrão como escala e tela cheia.
  */
 
-// Constantes para configuração de sensibilidade do zoom
-const ZOOM_SENSITIVITY = {
-  MIN: 60,      // Valor mínimo permitido para a sensibilidade do zoom
-  MAX: 2000,    // Valor máximo permitido para a sensibilidade do zoom
-  DEFAULT: 950  // Valor padrão de sensibilidade do zoom
-};
+// Importa os estilos e o plugin do fullscreen
+import 'leaflet.fullscreen/Control.FullScreen.css';
+import 'leaflet.fullscreen';
+// import 'font-awesome/css/font-awesome.css';
 
-// Constantes para as classes CSS utilizadas na construção dos controles personalizados
-const CONTROL_CLASSES = {
-  CONTAINER: 'custom-map-control leaflet-bar', // Classe do container principal do controle
-  HEADER: 'control-header',                     // Classe do cabeçalho do controle
-  PANEL_DESCRIPTION: 'panel-description',       // Classe da descrição que aparece no cabeçalho
-  EXPANDED_PANEL: 'expanded-panel',             // Classe do painel expandido com os controles
-  ZOOM_SECTION: 'zoom-sensitivity-section',     // Classe da seção que controla a sensibilidade do zoom
-  DRAG_SECTION: 'drag-toggle-section'           // Classe da seção que controla a habilitação do arrasto do mapa
-};
+import { MAP_CONTROL_CONFIG } from '#utils/config.js';
+import { StationMarkers } from '#components/ana/gerenciadorDeMarcadores.js';
+import { ClassificationLayers } from '#components/ana/camadasClassificacao.js';
 
-/**
- * Configura os controles personalizados do mapa.
- * Essa função centraliza as configurações, chamando funções para definir padrões, adicionar o painel customizado
- * e incluir controles padrão (como escala e tela cheia).
- *
- * @param {Object} map - Instância do mapa Leaflet.
- */
-export function setupMapControls(map) {
-  configureMapDefaults(map);
-  addCustomControlPanel(map);
-  addStandardControls(map);
-}
+// Utiliza as configurações centralizadas para a sensibilidade do zoom e as classes CSS
+const ZOOM_SENSITIVITY = MAP_CONTROL_CONFIG.ZOOM_SENSITIVITY;
+const CONTROL_CLASSES = MAP_CONTROL_CONFIG.CONTROL_CLASSES;
+
 
 /**
  * Configura os valores padrão do mapa.
@@ -65,7 +49,6 @@ function addStandardControls(map) {
  * @returns {HTMLElement} Container do controle customizado.
  */
 function createControlContainer() {
-  // Cria o container utilizando L.DomUtil.create com a classe definida em CONTROL_CLASSES.CONTAINER
   const container = L.DomUtil.create('div', CONTROL_CLASSES.CONTAINER);
   container.innerHTML = `
       <div class="${CONTROL_CLASSES.HEADER}">
@@ -95,7 +78,7 @@ function createControlContainer() {
         </div>
       </div>
     `;
-  // Desabilita a propagação de cliques para que o controle não interfira com os cliques no mapa
+  // Impede que cliques no container propagam para o mapa
   L.DomEvent.disableClickPropagation(container);
   return container;
 }
@@ -127,35 +110,27 @@ function setupControlInteractions(container, map) {
 
 /**
  * Configura a lógica de toggle do painel customizado.
- * Quando o botão de toggle é clicado, alterna a visibilidade do painel expandido e da descrição.
  *
- * @param {Object} elements - Objeto contendo os elementos do painel (toggleBtn, expandedPanel, panelDescription).
+ * @param {Object} elements - Contém toggleBtn, expandedPanel e panelDescription.
  */
 function setupToggleLogic({ toggleBtn, expandedPanel, panelDescription }) {
   toggleBtn.onclick = () => {
-    // Verifica se o painel está visível (display 'block')
     const isVisible = expandedPanel.style.display === 'block';
-    // Alterna o display entre 'none' e 'block'
     expandedPanel.style.display = isVisible ? 'none' : 'block';
-    // Alterna a visibilidade da descrição também
     panelDescription.style.display = isVisible ? 'none' : 'block';
-    return false; // Impede comportamento padrão do link
+    return false;
   };
 }
 
 /**
  * Configura a sensibilidade do zoom.
- * Atualiza o valor do input e o valor exibido no span, e ajusta a opção do mapa.
  *
- * @param {Object} elements - Objeto contendo zoomInput e valueSpan.
+ * @param {Object} elements - Contém zoomInput e valueSpan.
  * @param {Object} map - Instância do mapa Leaflet.
  */
 function setupZoomSensitivity({ zoomInput, valueSpan }, map) {
-  // Inicializa o valor do input e do span com a configuração atual do mapa
   zoomInput.value = map.options.wheelPxPerZoomLevel;
   valueSpan.textContent = map.options.wheelPxPerZoomLevel;
-
-  // Ao alterar o input, atualiza a sensibilidade do zoom no mapa e o valor exibido
   zoomInput.onchange = ({ target }) => {
     map.options.wheelPxPerZoomLevel = Number(target.value);
     valueSpan.textContent = target.value;
@@ -165,99 +140,150 @@ function setupZoomSensitivity({ zoomInput, valueSpan }, map) {
 /**
  * Configura o toggle para habilitar ou desabilitar o arrasto do mapa.
  *
- * @param {Object} elements - Objeto contendo dragCheckbox.
+ * @param {Object} elements - Contém dragCheckbox.
  * @param {Object} map - Instância do mapa Leaflet.
  */
 function setupDragToggle({ dragCheckbox }, map) {
   dragCheckbox.onchange = ({ target }) => {
-    // Se o checkbox estiver marcado, habilita o arrasto; caso contrário, desabilita
     target.checked ? map.dragging.enable() : map.dragging.disable();
   };
 }
 
 /**
  * Adiciona o painel de controle customizado ao mapa.
- * Cria o container de controle, configura as interações e o adiciona ao mapa na posição 'topleft'.
  *
  * @param {Object} map - Instância do mapa Leaflet.
  */
 function addCustomControlPanel(map) {
-  // Cria um novo controle Leaflet na posição 'topleft'
   const customControl = L.control({ position: 'topleft' });
-
-  // Define a função onAdd para criar e configurar o container do controle
   customControl.onAdd = () => {
     const container = createControlContainer();
     setupControlInteractions(container, map);
     return container;
   };
-
-  // Adiciona o controle customizado ao mapa
   customControl.addTo(map);
 }
 
 /**
  * Adiciona o controle de escala ao mapa.
- * Configura o controle para exibir a escala em metros (não imperial) e posiciona-o no canto inferior esquerdo.
  *
  * @param {Object} map - Instância do mapa Leaflet.
  */
 function addScaleControl(map) {
-  L.control.scale({
-    position: 'bottomleft',
-    metric: true,
-    imperial: false,
-    maxWidth: 90,
-    updateWhenIdle: false
-  }).addTo(map);
+  L.control.scale(MAP_CONTROL_CONFIG.SCALE_CONTROL_CONFIG).addTo(map);
 }
-
-
-function enableHoverPopups() {
-  // Seleciona todos os marcadores e adiciona listeners de mouseover/mouseout
-  StationMarkers.getAllMarkers().forEach(marker => {
-    marker.on('mouseover', (e) => {
-      // Cria e exibe popup flutuante
-    });
-    marker.on('mouseout', (e) => {
-      // Remove popup flutuante
-    });
-  });
-}
-
-
 
 /**
  * Adiciona o controle de tela cheia ao mapa.
- * Configura o controle com ícones e textos para entrar e sair do modo tela cheia,
- * e altera o ícone conforme o estado do mapa.
  *
  * @param {Object} map - Instância do mapa Leaflet.
  */
 function addFullscreenControl(map) {
-  // Cria o controle de tela cheia com as opções definidas
-  const fullscreenControl = L.control.fullscreen({
-    position: 'topright',
-    title: 'Ver em tela cheia',
-    titleCancel: 'Sair de tela cheia',
-    forceSeparateButton: true,
-    pseudoFullscreen: false,
-    content: '<i class="fa fa-expand"></i>' // Ícone inicial para entrar em tela cheia
-  }).addTo(map);
-
-  // Evento: Quando o mapa entra em tela cheia, altera o ícone para "compress" (indicando que pode sair da tela cheia)
+  const fullscreenControl = L.control.fullscreen(MAP_CONTROL_CONFIG.FULLSCREEN_CONTROL_CONFIG).addTo(map);
   map.on('enterFullscreen', function () {
     const button = fullscreenControl.getContainer().querySelector('a');
     if (button) {
-      button.innerHTML = '<i class="fa fa-compress"></i>';
+      button.innerHTML = MAP_CONTROL_CONFIG.FULLSCREEN_CONTROL_CONFIG.enterIcon;
     }
   });
-
-  // Evento: Quando o mapa sai do modo tela cheia, altera o ícone para "expand" (indicando que pode entrar em tela cheia)
   map.on('exitFullscreen', function () {
     const button = fullscreenControl.getContainer().querySelector('a');
     if (button) {
-      button.innerHTML = '<i class="fa fa-expand"></i>';
+      button.innerHTML = MAP_CONTROL_CONFIG.FULLSCREEN_CONTROL_CONFIG.exitIcon;
     }
   });
 }
+
+
+function addClusterToggleControl(map) {
+  const toggleControl = L.control({ position: 'topleft' });
+
+  toggleControl.onAdd = function () {
+    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+    container.title = 'Ativar/Desativar Clustering';
+
+    const button = L.DomUtil.create('a', '', container);
+    button.href = '#';
+    button.innerHTML = 'C';
+
+    L.DomEvent.disableClickPropagation(container);
+    L.DomEvent.disableScrollPropagation(container);
+
+    let isClusterActive = true;
+
+    L.DomEvent.on(button, 'click', (e) => {
+      L.DomEvent.preventDefault(e);
+
+      if (isClusterActive) {
+        // DESATIVAR CLUSTER
+        // 1) Desabilita cluster na "Todas Estações" se ela estiver no mapa
+        if (map.hasLayer(StationMarkers.getLayer())) {
+          StationMarkers.disableCluster(); 
+          // Se "Todas Estações" estiver ativa, remove o cluster e adiciona a versão sem cluster
+        }
+
+        // 2) Para cada camada de classificação
+        const clusterLayers = ClassificationLayers.getClusterLayers();   // { "Chuva - Forte": markerClusterGroup, ... }
+        const noClusterLayers = ClassificationLayers.getNoClusterLayers(); // { "Chuva - Forte": layerGroup, ... }
+
+        Object.keys(clusterLayers).forEach(layerName => {
+          const clusterLayer = clusterLayers[layerName];
+          const noClusterLayer = noClusterLayers[layerName];
+          
+          if (map.hasLayer(clusterLayer)) {
+            // Se essa camada com cluster está ativa, removemos e adicionamos a sem cluster
+            map.removeLayer(clusterLayer);
+            map.addLayer(noClusterLayer);
+          }
+        });
+
+        isClusterActive = false;
+        button.innerHTML = 'NC';
+      } else {
+        // ATIVAR CLUSTER
+        // 1) Se "Todas Estações" estiver no mapa, habilitar cluster
+        if (map.hasLayer(StationMarkers.getLayer())) {
+          StationMarkers.enableCluster();
+        }
+
+        // 2) Para cada camada de classificação
+        const clusterLayers = ClassificationLayers.getClusterLayers();
+        const noClusterLayers = ClassificationLayers.getNoClusterLayers();
+
+        Object.keys(clusterLayers).forEach(layerName => {
+          const clusterLayer = clusterLayers[layerName];
+          const noClusterLayer = noClusterLayers[layerName];
+
+          if (map.hasLayer(noClusterLayer)) {
+            // Se a camada sem cluster está ativa, remove e adiciona a versão com cluster
+            map.removeLayer(noClusterLayer);
+            map.addLayer(clusterLayer);
+          }
+        });
+
+        isClusterActive = true;
+        button.innerHTML = 'C';
+      }
+    });
+
+    return container;
+  };
+
+  toggleControl.addTo(map);
+}
+
+/**
+ * Configura os controles personalizados do mapa.
+ * Essa função centraliza as configurações, chamando funções para definir padrões, adicionar o painel customizado
+ * e incluir controles padrão (como escala e tela cheia).
+ *
+ * @param {Object} map - Instância do mapa Leaflet.
+ */
+export function setupMapControls(map) {
+  configureMapDefaults(map);
+  addCustomControlPanel(map);
+  addStandardControls(map);
+}
+
+
+export { addClusterToggleControl };

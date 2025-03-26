@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <!-- Define um estilo com ícone personalizado e label -->
+    <Style id="customIconStyle">
+      <IconStyle>
+        <!-- Ajuste o 'scale' se quiser aumentar/diminuir o tamanho do ícone -->
+        <scale>1.2</scale>
+        <Icon>
+          <!-- URL da imagem/ícone -->
+          <href>https://i.postimg.cc/0NkCyzYd/LOGO-sem-fundo.png</href>
+        </Icon>
+      </IconStyle>
+      <!-- LabelStyle: controla a exibição do rótulo (o conteúdo do <name>) -->
+      <LabelStyle>
+        <!-- O valor de scale aqui define o tamanho do texto -->
+        <scale>1.2</scale>
+      </LabelStyle>
+    </Style>
+
+    <Placemark>
+      <!-- O conteúdo do <name> é exibido como rótulo acima do ícone -->
+      <name>Defesa Civil - MT</name>
+      <!-- A descrição pode conter mais informações, se necessário -->
+      <description>Defesa Civil - MT</description>
+      <!-- Aplica o estilo definido -->
+      <styleUrl>#customIconStyle</styleUrl>
+      <Point>
+        <!-- Ordem: longitude, latitude, altitude -->
+        <coordinates>-56.07522231119225,-15.56800916459421</coordinates>
+      </Point>
+    </Placemark>
+  </Document>
+</kml>

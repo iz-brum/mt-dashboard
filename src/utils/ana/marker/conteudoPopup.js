@@ -1,7 +1,8 @@
-// popupContent.js
+// file: src/utils/ana/marker/conteudoPopup.js
+
 import { DataFormatter } from '#utils/formatoData.js';
-import { createTelemetricSection } from '#utils/ana/telemetry/secaoTelemetria.js';
-import { DEFAULT_CONFIG } from '#utils/ana/config.js';
+import { createTelemetricSection } from '#utils/ana/marker/secaoTelemetria.js';
+import { DEFAULT_CONFIG } from '#utils/config.js';
 
 
 export async function createPopupContent(station) {
@@ -62,6 +63,5 @@ export async function createPopupContent(station) {
   `;
   const telemetricContent = await createTelemetricSection(station);
 
-  const fullContent = staticContent + `<div class="telemetric-section">${telemetricContent}</div></div>`;
-  return fullContent;
+  return staticContent + `<div class="telemetric-section">${telemetricContent}</div></div>`;
 }

@@ -1,0 +1,114 @@
+/* Modal principal */
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95vw;
+    /* 95% da largura da viewport */
+    height: min-content;
+    max-height: 90vh;
+    /* 95% da altura da viewport */
+    background: #fff;
+    z-index: 1000;
+    overflow: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Corpo do modal */
+.modal-body {
+    padding: 20px;
+}
+
+/* Botão de fechamento */
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+/* Contêiner de gráficos */
+.chart-container {
+    width: 100%;
+    height: 440px;
+    /* ajuste conforme necessário */
+    max-height: 500px;
+    margin-bottom: 20px;
+}
+
+/* Contêiner da lista (texto) */
+.modal-list-container {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* UL em grid, mas de forma flexível */
+.modal-list-grid {
+    display: grid;
+    /* Ajuste o minmax para controlar o tamanho mínimo de cada item */
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Cada item (li) com altura fixa */
+.modal-list-grid li {
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    text-align: center;
+    /* Mesma altura para todos */
+    height: 60px;
+    /* Centraliza texto vertical e horizontalmente */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.modal-content-container {
+    display: flex;
+    align-items: flex-start;
+    /* Alinha pelo topo */
+    gap: 20px;
+    /* Espaço horizontal entre colunas */
+}
+
+.modal-list-section {
+    order: 1;
+    width: 23%;
+    min-width: 200px;
+    align-self: anchor-center;
+    /* Mantido, mesmo não sendo uma propriedade padrão do CSS */
+}
+
+.modal-graph-section {
+    order: 2;
+    flex: 1;
+    min-width: 0;
+    align-self: anchor-center;
+    /* Mantido aqui também, se desejar */
+}
+
+/* Aumenta o tamanho do contêiner do gráfico */
+.modal-graph-section .chart-container {
+    width: 100%;
+    height: 500px !important;
+    /* Valor maior */
+    max-height: 750px !important;
+    margin-bottom: 20px;
+}
+
+.chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.interval-container {
+    margin-bottom: 15px;
+}

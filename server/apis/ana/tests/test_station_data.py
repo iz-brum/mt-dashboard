@@ -63,7 +63,7 @@ class TestHidroWebStationData(unittest.TestCase):
         ]  # Códigos das estações para buscar
 
         filtro_data = "DATA_LEITURA"
-        data_busca = "2025-02-22"
+        data_busca = "2025-03-22"
         intervalo_busca = "HORA_24"
 
         try:

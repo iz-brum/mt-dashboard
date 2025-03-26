@@ -24,19 +24,18 @@
     /* Largura ajustada conforme o conteúdo */
     max-width: 600px;
     /* Largura máxima do popup */
-    margin: 30px 15px 15px;
+    margin: 25px 10px 8px;
     /* Margens ao redor do popup */
     font-family: 'Segoe UI', system-ui, sans-serif;
     /* Fonte utilizada no popup */
-    line-height: 1.25;
+    line-height: 1.05;
     /* Altura da linha para melhor legibilidade */
 }
 
 /* Estiliza o botão de fechar do popup */
 .leaflet-container a.leaflet-popup-close-button {
-    top: 2px;
-    /* Posição superior do botão */
-    right: 4px;
+    top: 0;
+    right: 3px;
     /* Posição à direita do botão */
     font: 19px / 24px Tahoma, Verdana, sans-serif;
     /* Fonte e tamanho do botão */
@@ -51,7 +50,7 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     /* Cria duas colunas de largura igual */
-    gap: 5px 15px;
+    gap: 5px 5px;
     /* Espaço entre linhas (12px) e colunas (25px) */
     padding: 5px 0;
     /* Espaçamento vertical interno */
@@ -131,7 +130,7 @@
 .geocoding-data-label {
     color: #6b7280;
     /* Cor cinza para os labels */
-    font-size: 0.9em;
+    font-size: 0.85em;
     /* Tamanho da fonte dos labels */
     font-weight: 500;
     /* Peso médio da fonte */
@@ -148,7 +147,7 @@
 .geocoding-data-value {
     color: #1f2937;
     /* Cor escura para os valores */
-    font-size: 0.95em;
+    font-size: 0.8em;
     /* Tamanho da fonte dos valores */
     font-weight: 600;
     /* Peso forte da fonte */
@@ -160,7 +159,7 @@
 .telemetric-card .data-value {
     color: #1d4ed8;
     /* Cor azul para realçar */
-    font-size: 1.1em;
+    font-size: 1em;
     /* Tamanho de fonte maior */
 }
 
@@ -299,11 +298,6 @@
     margin: 8px 0 -11px 0;
 }
 
-/* Estilos para o conteúdo interno do marcador (ícone) */
-.marker-content {
-    padding: 2px 6px;
-    width: fit-content;
-}
 
 /* ================================ */
 /* Substituição das regras existentes */
@@ -385,26 +379,6 @@
 }
 
 
-/* ============= */
-
-.dynamic-marker {
-    transition: transform 0.2s ease;
-}
-
-.marker-content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 2px solid white;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    font-weight: bold;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    padding: 0 10px;
-}
-
-
 .time-info {
     border-bottom: 0px dotted #999;
     transition: opacity 0.2s;
@@ -444,33 +418,34 @@
 .floating-info-box {
     background: #f8f9fc;
     border-radius: 6px;
-    padding: 8px 3px;
+    padding: 7px 1px;
     border: 1px solid #eef2ff;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    min-width: 90px;
-    z-index: 10000; /* Prioridade máxima */
-    position: fixed; /* Fixo em relação à viewport */
-    pointer-events: none; /* Permite interação com o mapa abaixo */
+    min-width: 55px;
+    min-height: 45px;
+    z-index: 10000;
+    position: fixed;
+    pointer-events: none;
     display: none;
-    /* Inicia oculto */
+    font-size: x-small;
 }
 
 /* Cota - mais à esquerda do marcador */
 .floating-cota {
-    transform: translate(-55%, 0%);
+    transform: translate(-17%, 0%);
 }
 
 /* Vazão - centralizada abaixo do marcador */
 .floating-vazao {
-    transform: translate(15%, 0%);
+    transform: translate(40%, -15%);
 }
 
 /* Chuva - mais à direita do marcador */
 .floating-chuva {
-    transform: translate(22%, 0%);
+    transform: translate(-9%, 0%);
 }
 
 /* Ajuste dos textos dentro dos quadros */
@@ -543,27 +518,6 @@
     color: #333;
 }
 
-/* Overlay para o spinner (enquanto carrega) */
-.spinner-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* Sem background => transparente */
-}
-
-/* Container do gráfico, caso queira estilizar */
-.chart-container {
-    width: 100%;
-    height: 48vh;
-    /* ou outro valor que preferir */
-    margin-top: 40px;
-}
-
 .modal-tabs-below {
     margin: -28px 0 0 38px;
 }
@@ -573,14 +527,63 @@
 }
 
 
-/* ========= animação de carregamento do modal/grafico telemétrico */
-.spinner {
-    border: 10px solid rgba(0, 0, 0, 0.1);
-    border-top: 8px solid #3498db;
+/* Classe base do cluster */
+.marker-cluster {
+    background-clip: padding-box;
     border-radius: 50%;
-    width: 80px;
-    height: 80px;
-    animation: spin 1s linear infinite;
+    text-align: center;
+    color: #fff;
+    border: 2px solid #fff;
+    font: 14px "Helvetica Neue", Arial, Helvetica, sans-serif;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10 !important;
+}
+
+/* Cluster pequeno */
+.marker-cluster-small {
+    background-color: #9098eea6 !important;
+    /* verde claro */
+    width: 30px;
+    height: 30px;
+    z-index: 10 !important;
+}
+
+/* Cluster médio */
+.marker-cluster-medium {
+    background-color: #006effb6 !important;
+    /* laranja */
+    width: 40px;
+    height: 40px;
+    z-index: 10 !important;
+}
+
+/* Cluster grande */
+.marker-cluster-large {
+    background-color: #7b00ffb5 !important;
+    /* vermelho */
+    width: 50px;
+    height: 50px;
+    z-index: 10 !important;
+}
+
+
+@keyframes blinker {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.65;
+    }
+}
+
+.blinking-marker {
+    animation: blinker 1s ease-out infinite;
 }
 
 @keyframes spin {

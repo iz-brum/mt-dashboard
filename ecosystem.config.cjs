@@ -34,6 +34,17 @@ module.exports = {
       },
       watch: false,
       ignore_watch: ["public/data/**", "public/dist/**", "node_modules/**"]
+    },
+    {
+      name: 'cemaden-scheduler',
+      script: './venv/Scripts/python.exe',
+      args: '-m server.apis.ana.services.cemaden_data_scheduler',
+      cwd: './',
+      env: {
+        NODE_ENV: 'development'
+      },
+      watch: false,
+      ignore_watch: ["public/data/**", "public/dist/**", "node_modules/**"]
     }
   ]
 };

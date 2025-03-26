@@ -20,9 +20,12 @@
 
 /* Define o estilo base para o container do controle customizado */
 .custom-map-control {
-    background: #fff;                           /* Fundo branco */
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);     /* Sombra para dar profundidade */
-    border-radius: 4px;                           /* Bordas arredondadas */
+    background: #fff;
+    /* Fundo branco */
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+    /* Sombra para dar profundidade */
+    border-radius: 4px;
+    /* Bordas arredondadas */
 }
 
 /* ==================== */
@@ -31,9 +34,12 @@
 
 /* Estilo para o cabeçalho do controle, que contém o botão de toggle e a descrição */
 .control-header {
-    display: flex;                              /* Utiliza Flexbox para alinhamento */
-    justify-content: space-between;             /* Espaça os itens de forma uniforme */
-    align-items: center;                        /* Alinha verticalmente os itens */
+    display: flex;
+    /* Utiliza Flexbox para alinhamento */
+    justify-content: space-between;
+    /* Espaça os itens de forma uniforme */
+    align-items: center;
+    /* Alinha verticalmente os itens */
 }
 
 /* ==================== */
@@ -42,10 +48,14 @@
 
 /* Estilo para a descrição do painel, exibida no cabeçalho */
 .panel-description {
-    font-size: 0.75rem;                         /* Tamanho de fonte reduzido (aproximadamente 12px) */
-    color: #555;                                /* Cor cinza para o texto */
-    display: none;                              /* Oculto por padrão */
-    margin-right: 25%;                          /* Margem à direita para espaçamento */
+    font-size: 0.75rem;
+    /* Tamanho de fonte reduzido (aproximadamente 12px) */
+    color: #555;
+    /* Cor cinza para o texto */
+    display: none;
+    /* Oculto por padrão */
+    margin-right: 25%;
+    /* Margem à direita para espaçamento */
 }
 
 /* ==================== */
@@ -54,9 +64,12 @@
 
 /* Estilo para o painel expandido que contém as configurações */
 .expanded-panel {
-    display: none;                              /* Oculto por padrão (exibido ao ser expandido) */
-    padding: 10px 5px 5px;                       /* Padding interno: 10px no topo, 5px nas laterais e fundo */
-    min-width: 200px;                           /* Largura mínima para garantir espaço suficiente */
+    display: none;
+    /* Oculto por padrão (exibido ao ser expandido) */
+    padding: 10px 5px 5px;
+    /* Padding interno: 10px no topo, 5px nas laterais e fundo */
+    min-width: 200px;
+    /* Largura mínima para garantir espaço suficiente */
 }
 
 /* ==================== */
@@ -65,22 +78,30 @@
 
 /* Define o layout da seção de sensibilidade de zoom */
 .zoom-sensitivity-section {
-    display: flex;                              /* Usa Flexbox para alinhar os itens */
-    align-items: center;                        /* Alinha verticalmente */
-    gap: 8px;                                   /* Espaço entre os itens */
-    padding: 5px 0;                             /* Padding vertical */
+    display: flex;
+    /* Usa Flexbox para alinhar os itens */
+    align-items: center;
+    /* Alinha verticalmente */
+    gap: 8px;
+    /* Espaço entre os itens */
+    padding: 5px 0;
+    /* Padding vertical */
 }
 
 /* Estilos para a imagem (ícone) dentro da seção de sensibilidade de zoom */
 .zoom-sensitivity-section img {
-    width: 20px;                                /* Largura do ícone */
-    height: 20px;                               /* Altura do ícone */
-    vertical-align: middle;                     /* Alinha verticalmente com o texto */
+    width: 20px;
+    /* Largura do ícone */
+    height: 20px;
+    /* Altura do ícone */
+    vertical-align: middle;
+    /* Alinha verticalmente com o texto */
 }
 
 /* Configura o input range para que ele ocupe o espaço disponível */
 .zoom-sensitivity-section input[type="range"] {
-    flex-grow: 1;                               /* Expande para preencher o espaço restante */
+    flex-grow: 1;
+    /* Expande para preencher o espaço restante */
 }
 
 /* ==================== */
@@ -89,16 +110,22 @@
 
 /* Define o layout da seção para alternar o arrasto do mapa */
 .drag-toggle-section {
-    margin-top: 10px;                           /* Espaço acima da seção */
-    display: flex;                              /* Usa Flexbox para alinhar os itens */
-    align-items: center;                        /* Alinha verticalmente */
-    gap: 8px;                                   /* Espaço entre os itens */
-    padding: 5px 0;                             /* Padding vertical */
+    margin-top: 10px;
+    /* Espaço acima da seção */
+    display: flex;
+    /* Usa Flexbox para alinhar os itens */
+    align-items: center;
+    /* Alinha verticalmente */
+    gap: 8px;
+    /* Espaço entre os itens */
+    padding: 5px 0;
+    /* Padding vertical */
 }
 
 /* Define o tamanho do ícone (fa-hand-paper) dentro da seção de toggle de arrasto */
 .drag-toggle-section .fa-hand-paper {
-    font-size: 1.25rem;                         /* Tamanho da fonte (aproximadamente 20px) */
+    font-size: 1.25rem;
+    /* Tamanho da fonte (aproximadamente 20px) */
 }
 
 /* ==================== */
@@ -107,12 +134,18 @@
 
 /* Estilo para a seção que contém o botão de limpar marcadores */
 .clear-markers-section {
-    margin-top: 10px;                           /* Espaço acima da seção */
-    border-top: 1px solid #ccc;                  /* Borda superior para separação */
-    padding: 10px 0 0;                           /* Padding: 10px no topo, 0 nas laterais e fundo */
-    display: flex;                              /* Usa Flexbox para layout */
-    align-items: center;                        /* Alinha verticalmente */
-    gap: 6px;                                   /* Espaço entre os itens */
+    margin-top: 10px;
+    /* Espaço acima da seção */
+    border-top: 1px solid #ccc;
+    /* Borda superior para separação */
+    padding: 10px 0 0;
+    /* Padding: 10px no topo, 0 nas laterais e fundo */
+    display: flex;
+    /* Usa Flexbox para layout */
+    align-items: center;
+    /* Alinha verticalmente */
+    gap: 6px;
+    /* Espaço entre os itens */
 }
 
 /* ==================== */
@@ -121,10 +154,13 @@
 
 /* Container do switch customizado */
 .switch {
-    position: relative;                         /* Posicionamento relativo para posicionamento dos elementos internos */
+    position: relative;
+    /* Posicionamento relativo para posicionamento dos elementos internos */
     display: inline-block;
-    width: 40px;                                /* Largura do switch */
-    height: 20px;                               /* Altura do switch */
+    width: 40px;
+    /* Largura do switch */
+    height: 20px;
+    /* Altura do switch */
 }
 
 /* Esconde o input nativo do switch */
@@ -142,38 +178,50 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;                     /* Cor de fundo padrão do switch */
-    transition: .4s;                            /* Transição suave para mudanças de estado */
+    background-color: #ccc;
+    /* Cor de fundo padrão do switch */
+    transition: .4s;
+    /* Transição suave para mudanças de estado */
 }
 
 /* Estilos para o indicador dentro do slider */
 .slider:before {
     position: absolute;
     content: "";
-    height: 16px;                               /* Altura do indicador */
-    width: 16px;                                /* Largura do indicador */
-    left: 2px;                                  /* Posição horizontal inicial */
-    bottom: 2px;                                /* Posição vertical inicial */
-    background-color: white;                    /* Cor de fundo do indicador */
-    transition: .4s;                            /* Transição suave para alterações de posição */
+    height: 16px;
+    /* Altura do indicador */
+    width: 16px;
+    /* Largura do indicador */
+    left: 2px;
+    /* Posição horizontal inicial */
+    bottom: 2px;
+    /* Posição vertical inicial */
+    background-color: white;
+    /* Cor de fundo do indicador */
+    transition: .4s;
+    /* Transição suave para alterações de posição */
 }
 
 /* Estado quando o input está selecionado: altera o background e move o indicador */
-input:checked + .slider {
-    background-color: #2196F3;                  /* Cor de fundo quando selecionado */
+input:checked+.slider {
+    background-color: #2196F3;
+    /* Cor de fundo quando selecionado */
 }
 
-input:checked + .slider:before {
-    transform: translateX(20px);                /* Move o indicador para a direita */
+input:checked+.slider:before {
+    transform: translateX(20px);
+    /* Move o indicador para a direita */
 }
 
 /* Estilos para um slider com bordas arredondadas */
 .slider.round {
-    border-radius: 34px;                        /* Arredonda o slider */
+    border-radius: 34px;
+    /* Arredonda o slider */
 }
 
 .slider.round:before {
-    border-radius: 50%;                         /* Arredonda o indicador */
+    border-radius: 50%;
+    /* Arredonda o indicador */
 }
 
 /* ==================== */
@@ -182,13 +230,54 @@ input:checked + .slider:before {
 
 /* Efeito hover para o botão de toggle do painel */
 .toggle-panel:hover {
-    opacity: 0.8;                               /* Reduz a opacidade para indicar interatividade */
+    opacity: 0.8;
+    /* Reduz a opacidade para indicar interatividade */
 }
 
 /* Define a aparência ao focar em botões, inputs ou o switch */
 button:focus,
 input:focus,
 .switch:focus {
-    outline: 2px solid #2196F3;                  /* Exibe um contorno azul */
-    outline-offset: 2px;                        /* Espaçamento entre o contorno e o elemento */
+    outline: 2px solid #2196F3;
+    /* Exibe um contorno azul */
+    outline-offset: 2px;
+    /* Espaçamento entre o contorno e o elemento */
+}
+
+.leaflet-bar.leaflet-control a {
+    background-color: #fff;
+    color: #333;
+    width: 28px;
+    height: 28px;
+    display: block;
+    text-align: center;
+    line-height: 28px;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.leaflet-bar.leaflet-control a:hover {
+    background-color: #f4f4f4;
+}
+
+.leaflet-control-measure-toggle.js-toggle {
+    /* Oculta o texto */
+    text-indent: -9999px;
+    overflow: hidden;
+    position: relative;
+    width: 32px;
+    /* Ajuste conforme o tamanho do ícone */
+    height: 32px;
+}
+
+/* Insere um ícone via pseudo-elemento */
+.leaflet-control-measure-toggle.js-toggle::after {
+    content: "\f545"; /* unicode do fa-ruler no FA 5 (solid) */
+    /* Exemplo: unicode do fa-arrows-alt em FontAwesome 4.7 */
+    font-family: "FontAwesome";
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translate(-70%, -50%);
+    font-size: 18px;
 }

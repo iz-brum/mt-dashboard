@@ -12,7 +12,11 @@
  * @requires leaflet-control-geocoder          Controle de geocodificação
  */
 
-// Cache para armazenar resultados de geocodificação e evitar requisições repetidas
+import { DEFAULT_CONFIG, CACHE_CONFIG } from '#utils/config.js';
+import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+import 'leaflet-control-geocoder';
+
+// Cache para armazenar resultados de geocodificação, com timestamp para expiração
 const cache = {};
 
 // Conjunto para armazenar as coordenadas (como string "lat,lng") dos marcadores já adicionados
@@ -46,14 +50,17 @@ const debounce = (func, delay) => {
 async function exibirInformacoesLocal(latlng, marker, retryCount = 0) {
     // Cria uma chave única baseada nas coordenadas para utilizar no cache
     const key = `${latlng.lat},${latlng.lng}`;
-    // Se o resultado já está no cache, retorna-o imediatamente
-    if (cache[key]) return cache[key];
+
+    // Se o cache estiver habilitado e o resultado ainda for válido, retorna-o imediatamente
+    if (CACHE_CONFIG.GEOCODING.ENABLED && cache[key] && (Date.now() - cache[key].timestamp < CACHE_CONFIG.GEOCODING.TTL)) {
+        return cache[key].data;
+    }
 
     let content = '';
 
     try {
         // Realiza a requisição para o endpoint local de geocodificação
-        const response = await fetch(`http://localhost:3000/api/geocode?lat=${latlng.lat}&lng=${latlng.lng}`);
+        const response = await fetch(`${DEFAULT_CONFIG.GEOCODE_ENDPOINT}?lat=${latlng.lat}&lng=${latlng.lng}`);
 
         // Se a resposta indicar "Too Many Requests", trata a situação para retry
         if (response.status === 429) {
@@ -180,8 +187,11 @@ async function exibirInformacoesLocal(latlng, marker, retryCount = 0) {
         </div>
     `;
 
-    // Armazena o conteúdo obtido no cache para as coordenadas especificadas
-    cache[key] = content;
+    // Armazena o conteúdo obtido no cache para as coordenadas especificadas,
+    // se o cache estiver habilitado
+    if (CACHE_CONFIG.GEOCODING.ENABLED) {
+        cache[key] = { data: content, timestamp: Date.now() };
+    }
     return content;
 }
 
@@ -223,14 +233,13 @@ export function setupGeocoding(map) {
         }).openPopup();
 
         // Busca as informações detalhadas de geocodificação e atualiza o conteúdo do popup
-        const content = await exibirInformacoesLocal(latlng, marker); // Passa o marker para atualizar seu popup
+        const content = await exibirInformacoesLocal(latlng, marker);
         marker.getPopup().setContent(content);
 
         // Adiciona um event listener ao popup para tratar o clique no botão "Remover Marcador"
         const popupElement = marker.getPopup().getElement();
         if (popupElement) {
             const removeMarkerHandler = (e) => {
-                // Verifica se o elemento clicado possui a classe 'geocoding-remove-btn'
                 if (e.target.classList.contains('geocoding-remove-btn')) {
                     // Remove o marcador do mapa
                     map.removeLayer(marker);
@@ -248,21 +257,21 @@ export function setupGeocoding(map) {
 
     // Configura o controle de geocodificação utilizando o plugin do Leaflet
     const geocoder = L.Control.geocoder({
-        defaultMarkGeocode: false,              // Impede o comportamento padrão de marcar o geocode
-        position: 'topleft',                    // Posiciona o controle no canto superior esquerdo
-        placeholder: 'Buscar endereço...',      // Texto placeholder para o campo de busca
-        errorMessage: 'Endereço não encontrado.'// Mensagem de erro personalizada
+        defaultMarkGeocode: false,
+        position: 'topleft',
+        placeholder: 'Buscar endereço...',
+        errorMessage: 'Endereço não encontrado.'
     }).addTo(map);
 
     // Evento para geocodificação: quando um endereço é encontrado, centraliza o mapa e adiciona um marcador removível
     geocoder.on('markgeocode', (e) => {
         const latlng = e.geocode.center;
-        map.setView(latlng, 9); // Centraliza o mapa no local encontrado com zoom 9
-        addRemovableMarker(latlng); // Adiciona um marcador removível na posição encontrada
+        map.setView(latlng, 9);
+        addRemovableMarker(latlng);
     });
 
     // Cria uma versão debounced da função addRemovableMarker para evitar muitas chamadas em sequência
     const debouncedAddMarker = debounce((e) => addRemovableMarker(e.latlng), 300);
-    // Associa o evento de clique no mapa à função debounced, para adicionar marcadores com atraso controlado
     map.on('click', debouncedAddMarker);
 }
+// OK

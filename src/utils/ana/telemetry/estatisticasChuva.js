@@ -1,13 +1,11 @@
-// FILE: src/utils/ana/telemetry/estatisticasChuva.js
+import { DEFAULT_CONFIG, CACHE_CONFIG } from '#utils/config.js';
 
 let cacheEstatisticas = null;
 let ultimaAtualizacao = 0;
-const TEMPO_CACHE_MS = 90000; // 90 SEGUNDOS
-
-
+const TEMPO_CACHE_MS = CACHE_CONFIG.ESTATISTICAS.TTL; // Configurado via CACHE_CONFIG
 
 /**
- * Faz uma requisição para a API e retorna os dados ou um array vazio em caso de erro.
+ * Faz uma requisição para a API e retorna os dados ou um array/objeto vazio em caso de erro.
  * @param {string} url - URL da API.
  * @returns {Promise<Array|Object>} Dados da API ou um array/objeto vazio.
  */
@@ -18,7 +16,7 @@ async function fetchData(url) {
         return await response.json();
     } catch (error) {
         console.error(`Erro ao obter dados de ${url}:`, error);
-        return Array.isArray(url) ? [] : {}; // Retorna array ou objeto vazio dependendo da estrutura esperada
+        return Array.isArray(url) ? [] : {};
     }
 }
 
@@ -29,73 +27,109 @@ async function fetchData(url) {
 export async function obterDadosEstatisticos() {
     const agora = Date.now();
 
-    // 🟢 Se os dados ainda são válidos, retorna do cache sem fazer nova requisição
     if (cacheEstatisticas && (agora - ultimaAtualizacao < TEMPO_CACHE_MS)) {
-        // console.log("⚡ Usando cache para estatísticas");
         return cacheEstatisticas;
     }
 
-    // console.log("🔄 Buscando estatísticas do backend...");
-
     try {
-        // Requisições para as APIs
         const [cidadesData, estacoesData, estacoesCategorizadas] = await Promise.all([
-            fetchData('http://localhost:3000/api/stationData/estacoes/chuvaPorCidade'),
-            fetchData('http://localhost:3000/api/stationData/estacoes/todas'),
-            fetchData('http://localhost:3000/api/stationData/estacoes/categorizadas'),
+            fetchData(DEFAULT_CONFIG.DATA_SOURCE_CHUVA_POR_CIDADE),
+            fetchData(DEFAULT_CONFIG.DATA_SOURCE),
+            fetchData(DEFAULT_CONFIG.DATA_SOURCE_CATEGORIZADAS)
         ]);
 
-        // 🟢 Armazena os dados no cache
         cacheEstatisticas = calcularEstatisticas(cidadesData, estacoesData, estacoesCategorizadas);
         ultimaAtualizacao = agora;
 
         return cacheEstatisticas;
     } catch (error) {
-        console.error("❌ Erro ao buscar estatísticas:", error);
-        return cacheEstatisticas || {}; // Retorna cache antigo se disponível
+        console.error("Erro ao buscar estatísticas:", error);
+        return cacheEstatisticas || {};
     }
 }
 
 /**
- * Calcula estatísticas baseadas nos dados das cidades e estações.
- * @param {Array} cidadesData - Dados das chuvas por cidade.
- * @param {Array} estacoesData - Dados de todas as estações.
- * @param {Object} estacoesCategorizadas - Dados das estações categorizadas.
+ * Calcula estatísticas detalhadas das chuvas por cidade e estação.
+ * Agora utiliza a MÉDIA GLOBAL: soma de chuvaAcumulada de TODAS as estações / total de estações.
+ *
+ * @param {Array} cidadesData - Dados de chuva por cidade (cada item tem "chuvaMediana", "chuvaMedia", etc.).
+ * @param {Array} estacoesData - Dados de todas as estações (cada item tem "chuvaAcumulada", "Municipio_Nome", etc.).
+ * @param {Object} estacoesCategorizadas - Dados das estações categorizadas (para contagem de desatualizadas).
  * @returns {Object} Estatísticas calculadas.
  */
 function calcularEstatisticas(cidadesData, estacoesData, estacoesCategorizadas) {
+    // 🔹 Total de cidades monitoradas
     const totalCidadesMonitoradas = cidadesData.length;
     const listaCidades = cidadesData.map(cidade => cidade.cidade);
 
+    // 🔹 Filtra cidades com dados válidos para mediana (baseado na chuvaMediana da cidade)
+    const cidadesComMediana = cidadesData
+        .filter(cidade => cidade.chuvaMediana !== null && cidade.chuvaMediana > 0)
+        .map((cidade, index) => ({
+            index: index + 1,
+            nome: cidade.cidade,
+            mediana: cidade.chuvaMediana.toFixed(2) + " mm"
+        }));
+
+    // 🔹 Cidades sem chuva
     const cidadesSemChuva = cidadesData.filter(item => item.chuvaMedia === 0);
     const listaCidadesSemChuva = cidadesSemChuva.map(cidade => cidade.cidade);
 
-    const somaChuva = cidadesData.reduce((acc, item) => acc + item.chuvaMedia, 0);
-    const mediaGeral = cidadesData.length ? somaChuva / cidadesData.length : 0;
+    // ----------------------------------------------------------------------------
+    // 🔹 Cria um array com TODOS os valores de chuva (estação a estação), 
+    //     excluindo valores nulos/indefinidos (não substituindo por 0)
+    // ----------------------------------------------------------------------------
+    const allStationsChuva = estacoesData
+        .map(estacao => estacao.chuvaAcumulada)
+        .filter(valor => valor !== null && valor !== undefined)
+        .sort((a, b) => a - b);
 
-    const cidadesComChuvaElevada = cidadesData.filter(item => item.chuvaMedia > mediaGeral);
+    // ----------------------------------------------------------------------------
+    // 🔹 MÉDIA GLOBAL: soma de chuvaAcumulada de TODAS as estações / total de estações
+    // ----------------------------------------------------------------------------
+    const somaGlobalChuva = allStationsChuva.reduce((acc, val) => acc + val, 0);
+    const totalEstacoesGlobal = allStationsChuva.length;
+    const mediaGeralGlobal = totalEstacoesGlobal ? somaGlobalChuva / totalEstacoesGlobal : 0;
+
+    // ----------------------------------------------------------------------------
+    // 🔹 Calcula mediana global (usando todos os valores de chuva de todas as estações)
+    // ----------------------------------------------------------------------------
+    const totalGlobal = allStationsChuva.length;
+    const medianaGlobal = totalGlobal > 0
+        ? (totalGlobal % 2 === 1
+            ? allStationsChuva[Math.floor(totalGlobal / 2)]
+            : (allStationsChuva[totalGlobal / 2 - 1] + allStationsChuva[totalGlobal / 2]) / 2)
+        : 0;
+
+    // ----------------------------------------------------------------------------
+    // 🔹 Filtra cidades com chuva acima da MÉDIA GLOBAL
+    // ----------------------------------------------------------------------------
+    const cidadesComChuvaElevada = cidadesData.filter(item => (item.chuvaMediana || 0) > mediaGeralGlobal);
     const listaCidadesComChuvaElevada = cidadesComChuvaElevada.map(cidade => cidade.cidade);
 
+    // ----------------------------------------------------------------------------
+    // 🔹 Identifica a estação com o maior registro de chuva
+    // ----------------------------------------------------------------------------
     const estacaoMaiorChuva = estacoesData.reduce((max, estacao) =>
         estacao.chuvaAcumulada !== null && estacao.chuvaAcumulada > max.chuvaAcumulada ? estacao : max,
         { Municipio_Nome: "N/A", chuvaAcumulada: 0 }
     );
 
-    const valoresChuva = cidadesData.map(item => item.chuvaMedia || 0).sort((a, b) => a - b);
-    const totalValores = valoresChuva.length;
-    const mediana = totalValores > 0
-        ? (totalValores % 2 === 1
-            ? valoresChuva[Math.floor(totalValores / 2)]
-            : (valoresChuva[totalValores / 2 - 1] + valoresChuva[totalValores / 2]) / 2)
-        : 0;
+    // ----------------------------------------------------------------------------
+    // 🔹 Calcula o desvio padrão dos valores (usando o array allStationsChuva e a média global)
+    // ----------------------------------------------------------------------------
+    const somaQuadrados = allStationsChuva.reduce((acc, item) => acc + Math.pow(item - mediaGeralGlobal, 2), 0);
+    const desvioPadrao = allStationsChuva.length > 1 ? Math.sqrt(somaQuadrados / allStationsChuva.length) : 0;
 
-    const somaQuadrados = cidadesData.reduce((acc, item) => acc + Math.pow(item.chuvaMedia - mediaGeral, 2), 0);
-    const desvioPadrao = cidadesData.length > 1 ? Math.sqrt(somaQuadrados / cidadesData.length) : 0;
-
+    // ----------------------------------------------------------------------------
+    // Contagem de estações monitoradas e desatualizadas
+    // ----------------------------------------------------------------------------
     const totalEstacoesMonitoradas = cidadesData.reduce((acc, cidade) => acc + cidade.estacoes.length, 0);
     const totalEstacoesNA = estacoesCategorizadas.desatualizadas ? estacoesCategorizadas.desatualizadas.length : 0;
 
-
+    // ----------------------------------------------------------------------------
+    // Retorno do objeto de estatísticas formatado
+    // ----------------------------------------------------------------------------
     return {
         totalCidadesMonitoradas,
         listaCidades,
@@ -104,12 +138,21 @@ function calcularEstatisticas(cidadesData, estacoesData, estacoesCategorizadas) 
         cidadesComChuvaElevada: cidadesComChuvaElevada.length,
         listaCidadesComChuvaElevada,
         maiorRegistroChuva: `${estacaoMaiorChuva.Municipio_Nome} (${estacaoMaiorChuva.chuvaAcumulada.toFixed(2)} mm)`,
-        mediaGeralChuva: `${mediaGeral.toFixed(2)} mm`,  // ✅ Adicionado "mm"
-        medianaChuva: `${mediana.toFixed(2)} mm`,        // ✅ Adicionado "mm"
-        desvioPadraoChuva: `${desvioPadrao.toFixed(2)} mm`,  // ✅ Adicionado "mm"
+
+        // Média geral baseada em todas as estações
+        mediaGeralChuva: `${mediaGeralGlobal.toFixed(2)} mm`,
+
+        // Mediana global calculada com todos os valores de chuva
+        medianaChuva: `${medianaGlobal.toFixed(2)} mm`,
+
+        desvioPadraoChuva: `${desvioPadrao.toFixed(2)} mm`,
         totalEstacoesMonitoradas,
         totalEstacoesNA,
-        listaValoresChuva: valoresChuva,
+
+        // Lista de valores baseada na mediana das cidades (se já utilizada em outros gráficos)
+        listaValoresChuva: cidadesComMediana.map(item => parseFloat(item.mediana)).sort((a, b) => a - b),
+        // Nova lista: todos os valores de chuva das estações
+        listaValoresChuvaGlobal: allStationsChuva
     };
 }
 
@@ -118,8 +161,6 @@ function calcularEstatisticas(cidadesData, estacoesData, estacoesCategorizadas) 
  */
 export async function atualizarEstatisticasNaUI() {
     const estatisticas = await obterDadosEstatisticos();
-
-    // console.log("📊 Estatísticas carregadas:", estatisticas); // 🔥 Verifica se os valores estão corretos
 
     const elementos = {
         totalCidadesMonitoradas: 'totalCidades',
@@ -135,7 +176,6 @@ export async function atualizarEstatisticasNaUI() {
 
     Object.keys(elementos).forEach(key => {
         const elemento = document.getElementById(elementos[key]);
-        // console.log(`🔄 Atualizando ${elementos[key]}:`, estatisticas[key]); // Adiciona log para depuração
         if (elemento) {
             elemento.innerText = estatisticas[key] !== undefined ? estatisticas[key] : '--';
         }

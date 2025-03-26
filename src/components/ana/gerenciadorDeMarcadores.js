@@ -2,207 +2,266 @@
  * @file src/components/ana/gerenciadorDeMarcadores.js
  */
 
+import L from 'leaflet';
+import 'leaflet.markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import { createMarkerFromStation } from '#utils/ana/marker/marcador.js';
-import { createTelemetricSection } from '#utils/ana/telemetry/secaoTelemetria.js';
-import { attachPopupToggleEvents } from '#utils/ana/marker/alternarPopup.js';
-import { attachFloatingPopupEvents } from '#utils/ana/marker/floatingPopup.js'; 
-import { DEFAULT_CONFIG } from '#utils/ana/config.js';
+import { attachFloatingPopupEvents } from '#utils/ana/marker/floatingPopup.js';
+import { DEFAULT_CONFIG, MAP_MARKERS_CONFIG, FLOATING_POPUP_CONFIG, MARKER_STYLE_CONFIG } from '#utils/config.js';
+import { categorizeStation } from '#utils/ana/classification/categorizacaoEstacoes.js';
+import { ClassificationLayers } from '#components/ana/camadasClassificacao.js';
+import { HybridLayer } from '#components/ana/HybridLayer.js';
 
 export const StationMarkers = (() => {
-  let markerLayer = L.layerGroup();
+  // -------------------------------------------------
+  // 1) Funções auxiliares de cor do marcador
+  // -------------------------------------------------
+  function getMarkerColorByType(stationData, layerType) {
+    if (layerType === 'chuva') {
+      const classification = stationData.classificacaoChuva || 'default';
+      return (MARKER_STYLE_CONFIG.chuva[classification] || MARKER_STYLE_CONFIG.chuva.default).color;
+    } else if (layerType === 'nivel') {
+      const classification = stationData.classificacaoNivel || 'default';
+      return (MARKER_STYLE_CONFIG.nivel[classification] || MARKER_STYLE_CONFIG.nivel.default).color;
+    } else if (layerType === 'vazao') {
+      const classification = stationData.classificacaoVazao || 'default';
+      return (MARKER_STYLE_CONFIG.vazao[classification] || MARKER_STYLE_CONFIG.vazao.default).color;
+    }
+    return MARKER_STYLE_CONFIG.general.color;
+  }
+
+  function getMarkerTextColorByType(stationData, layerType) {
+    if (layerType === 'chuva') {
+      const classification = stationData.classificacaoChuva || 'default';
+      return (MARKER_STYLE_CONFIG.chuva[classification] || MARKER_STYLE_CONFIG.chuva.default).textColor;
+    } else if (layerType === 'nivel') {
+      const classification = stationData.classificacaoNivel || 'default';
+      return (MARKER_STYLE_CONFIG.nivel[classification] || MARKER_STYLE_CONFIG.nivel.default).textColor;
+    } else if (layerType === 'vazao') {
+      const classification = stationData.classificacaoVazao || 'default';
+      return (MARKER_STYLE_CONFIG.vazao[classification] || MARKER_STYLE_CONFIG.vazao.default).textColor;
+    }
+    return MARKER_STYLE_CONFIG.general.textColor;
+  }
+
+  function createClusterIcon(cluster, layerType) {
+    const childCount = cluster.getChildCount();
+    const markers = cluster.getAllChildMarkers();
+    let bgColor = '#999'; // fallback
+    let textColor = '#000';
+
+    if (markers && markers.length > 0) {
+      const stationData = markers[0].stationData || {};
+      bgColor = getMarkerColorByType(stationData, layerType);
+      textColor = getMarkerTextColorByType(stationData, layerType);
+    }
+
+    return L.divIcon({
+      html: `
+      <div 
+        style="
+          background-color: ${bgColor};
+          border-radius: 50%;
+          width: 25px; 
+          height: 25px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: ${textColor};
+          border: 2px solid #fff;
+        "
+      >
+        <span>${childCount}</span>
+      </div>
+    `,
+      className: '',
+      iconSize: L.point(40, 40)
+    });
+  }
+
   let currentMap = null;
-  let markerMap = new Map();
-  let canvasRenderer = L.canvas(); // Usa renderização via Canvas
-  let cachedLayer = null;
+  let clusterEnabled = true; // Flag para indicar se o cluster está ativo
 
+  // Cria o cluster principal e uma layer sem cluster
+  const clusterLayer = L.markerClusterGroup({
+    maxClusterRadius: 20,
+    iconCreateFunction: (cluster) => createClusterIcon(cluster, 'chuva'),
+    showCoverageOnHover: true,
+    polygonOptions: {
+      color: '#0fde18',
+      weight: 4,
+      opacity: 0.9,
+      fillOpacity: 0.8
+    }
+  });
+  const noClusterLayer = L.layerGroup();
+  const hybridPrincipal = new HybridLayer(clusterLayer, noClusterLayer, clusterEnabled);
 
-  // console.log("📌 [gerenciadorDeMarcadores] Módulo carregado.");
+  let markerMap = new Map(); // Mapeia stationCode -> { marker, camada }
 
-  // Função que filtra os marcadores com base nos limites visíveis do mapa.
   function filterMarkersByBounds() {
     if (!currentMap) return;
     const bounds = currentMap.getBounds();
 
-    let adicionados = 0;
-    let removidos = 0;
-
-    // console.log("🗺️ Map bounds atualizados:", bounds);
-
-    markerMap.forEach(marker => {
-      if (bounds.contains(marker.getLatLng())) {
-        if (!markerLayer.hasLayer(marker)) {
-          markerLayer.addLayer(marker);
-          // ✅ Reconfigura os popups flutuantes ao readicionar o marcador
+    markerMap.forEach((data) => {
+      const { marker } = data;
+      const isVisible = bounds.contains(marker.getLatLng());
+      if (isVisible) {
+        if (clusterEnabled && !clusterLayer.hasLayer(marker)) {
+          clusterLayer.addLayer(marker);
           if (!marker._floatingEventsAttached) {
-            marker.on('add', () => {
-              attachFloatingPopupEvents(marker, DEFAULT_CONFIG);
-            });
+            marker.on('add', () => attachFloatingPopupEvents(marker, DEFAULT_CONFIG));
             marker._floatingEventsAttached = true;
           }
-          adicionados++;
+        } else if (!clusterEnabled && !noClusterLayer.hasLayer(marker)) {
+          noClusterLayer.addLayer(marker);
+          if (!marker._floatingEventsAttached) {
+            marker.on('add', () => attachFloatingPopupEvents(marker, DEFAULT_CONFIG));
+            marker._floatingEventsAttached = true;
+          }
         }
       } else {
-        if (markerLayer.hasLayer(marker)) {
-          markerLayer.removeLayer(marker);
-          removidos++;
+        if (clusterEnabled && clusterLayer.hasLayer(marker)) {
+          clusterLayer.removeLayer(marker);
+        } else if (!clusterEnabled && noClusterLayer.hasLayer(marker)) {
+          noClusterLayer.removeLayer(marker);
         }
       }
     });
+  }
 
-    // console.log(`✅ Filtragem concluída: ${adicionados} marcadores adicionados, ${removidos} marcadores removidos.`);
+  function enableCluster() {
+    clusterEnabled = true;
+    noClusterLayer.clearLayers();
+    if (currentMap && !currentMap.hasLayer(clusterLayer)) {
+      currentMap.addLayer(clusterLayer);
+    }
+    hybridPrincipal.setClusterActive(true);
+    filterMarkersByBounds();
+  }
+
+  function disableCluster() {
+    clusterEnabled = false;
+    if (currentMap) {
+      currentMap.removeLayer(clusterLayer);
+      clusterLayer.clearLayers();
+    }
+    if (currentMap && !currentMap.hasLayer(noClusterLayer)) {
+      currentMap.addLayer(noClusterLayer);
+    }
+    hybridPrincipal.setClusterActive(false);
+    filterMarkersByBounds();
   }
 
   return {
     initialize: (map) => {
-      // console.log("🔧 [initialize] Iniciando controle de marcadores no mapa...");
-
       currentMap = map;
-      if (!map.hasLayer(markerLayer)) {
-        markerLayer.addTo(map);
-      }
-
+      map.addLayer(hybridPrincipal);
       let debounceTimer;
-      map.on('moveend', () => {
-        // console.count("📌 Evento moveend disparado");
+      map.on('moveend zoomend', () => {
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          // console.log("✅ Debounced moveend");
-          filterMarkersByBounds();
-        }, 300);
+        debounceTimer = setTimeout(filterMarkersByBounds, MAP_MARKERS_CONFIG.DEBOUNCE_DELAY_MS);
       });
-
-      map.on('zoomend', () => {
-        // console.count("📌 Evento zoomend disparado");
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          // console.log("✅ Debounced zoomend");
-          filterMarkersByBounds();
-        }, 300);
-      });
-
-      // console.log("✅ Eventos de mapa configurados.");
     },
-    load: async () => {
-      // console.time("⏳ Tempo de carregamento dos marcadores");
-      // console.log("🔄 [load] Carregando marcadores do backend...");
 
+    load: async () => {
       try {
         const response = await fetch(DEFAULT_CONFIG.DATA_SOURCE);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const stations = await response.json();
-        // console.log(`📍 ${stations.length} estações carregadas.`);
-
         stations.forEach(station => {
-          if (!markerMap.has(String(station.codigoestacao))) {
-            const marker = createMarkerFromStation(station, canvasRenderer);
+          const code = String(station.codigoestacao);
+          if (!markerMap.has(code)) {
+            const chuvaValor = station.chuvaAcumulada !== null && !isNaN(station.chuvaAcumulada)
+              ? `${station.chuvaAcumulada} ${FLOATING_POPUP_CONFIG.units.rainfall}`
+              : 'N/A';
+            const marker = createMarkerFromStation(station, L.canvas(), { text: chuvaValor });
             if (marker) {
-              markerLayer.addLayer(marker);
-              markerMap.set(String(station.codigoestacao), marker);
+              marker.stationData = station;
+              markerMap.set(code, { marker, camada: 'principal' });
+              hybridPrincipal.addLayer(marker);
             }
           }
         });
-
         filterMarkersByBounds();
       } catch (error) {
         console.error('❌ [load] Falha ao carregar estações:', error);
-      } finally {
-        // console.timeEnd("⏳ Tempo de carregamento dos marcadores");
       }
     },
+
     update: async (newStations) => {
-      // console.log("🔄 [update] Atualizando marcadores...");
-      // console.time("⏳ Tempo de atualização dos marcadores");
-
       const currentCodes = new Set(markerMap.keys());
-      let atualizados = 0;
-      let novos = 0;
-      let houveMudanca = false; // 🟢 Variável para verificar se os dados mudaram
-
+      let houveMudanca = false;
       newStations.forEach(station => {
         const code = String(station.codigoestacao);
-
         if (markerMap.has(code)) {
-          const marker = markerMap.get(code);
-
-          // 🔎 Só atualiza se os dados mudaram
-          if (JSON.stringify(marker.stationData) !== JSON.stringify(station)) {
-            marker.stationData = station;
+          const { marker } = markerMap.get(code);
+          const oldCategory = categorizeStation(marker.stationData);
+          const newCategory = categorizeStation(station);
+          const dadosMudaram = JSON.stringify(marker.stationData) !== JSON.stringify(station);
+          const categoriaMudou = JSON.stringify(oldCategory) !== JSON.stringify(newCategory);
+          if (dadosMudaram || categoriaMudou) {
+            // Atualiza os dados do marcador
+            marker.stationData = {
+              ...station,
+              classificacaoChuva: newCategory.classificacaoChuva,
+              classificacaoNivel: newCategory.classificacaoNivel,
+              classificacaoVazao: newCategory.classificacaoVazao
+            };
+            // Atualiza a posição caso ela tenha mudado
+            const newLat = parseFloat(station.latitude || station.Latitude);
+            const newLng = parseFloat(station.longitude || station.Longitude);
+            marker.setLatLng([newLat, newLng]);
+            // Atualiza o ícone (isso já reflete a nova classificação e alerta)
+            marker.updateIcon();
             houveMudanca = true;
-
-            if (marker.updateIcon) marker.updateIcon();
-            if (marker.isPopupOpen && marker.isPopupOpen()) {
-              createTelemetricSection(station).then(newTelemetric => {
-                const popupEl = marker.getPopup().getElement();
-                if (popupEl) {
-                  const telemetricEl = popupEl.querySelector('.telemetric-section');
-                  if (telemetricEl) {
-                    telemetricEl.innerHTML = newTelemetric;
-                  }
-                  attachPopupToggleEvents(popupEl);
-                }
-              });
-            }
-            if (marker.updateFloatingData) marker.updateFloatingData();
-            atualizados++;
           }
           currentCodes.delete(code);
-        } else {
-          const marker = createMarkerFromStation(station, canvasRenderer);
-          if (marker) {
-            markerLayer.addLayer(marker);
-            markerMap.set(code, marker);
-            novos++;
-            houveMudanca = true;
-          }
         }
       });
-
-      if (!houveMudanca) {
-        // console.log("⚠️ Nenhuma mudança nos dados, update cancelado.");
-        // console.timeEnd("⏳ Tempo de atualização dos marcadores");
-        return; // 🔴 Sai da função sem executar filtro
-      }
-
-      // console.log(`✅ Atualização concluída: ${atualizados} marcadores atualizados, ${novos} novos adicionados.`);
-
+      // Remove marcadores que não estão mais presentes na nova lista
       currentCodes.forEach(code => {
-        const marker = markerMap.get(code);
-        if (marker) {
-          markerLayer.removeLayer(marker);
-          map.removeLayer(marker);
-        }
+        const { marker } = markerMap.get(code);
+        hybridPrincipal.removeLayer(marker);
+        currentMap.removeLayer(marker);
         markerMap.delete(code);
       });
-
-      filterMarkersByBounds();
-      // console.timeEnd("⏳ Tempo de atualização dos marcadores");
-    },
-    clear: () => {
-      console.log("🗑️ [clear] Removendo todos os marcadores...");
-      markerLayer.clearLayers();
-      markerMap.clear();
-      console.log("✅ Todos os marcadores foram removidos.");
-    },
-    getLayer: () => {
-      if (!cachedLayer) {
-        // console.log("📌 [getLayer] Criando camada de marcadores.");
-        // console.trace("🔍 Trace da chamada de getLayer:");
-        cachedLayer = markerLayer;
-      } else {
-        // console.log("⚡ [getLayer] Retornando camada em cache.");
-        // console.trace("🔍 Trace da chamada de getLayer:");
+      if (houveMudanca) {
+        await ClassificationLayers.atualizarCamadas();
       }
-      return cachedLayer;
-    },
-    getMarkerByCode: (code) => {
-      console.log(`🔍 [getMarkerByCode] Buscando marcador ${code}`);
-      return markerMap.get(String(code));
-    },
-    getAllMarkers: () => {
-      return Array.from(markerMap.values());
-    }
+    },    
 
+    clear: () => {
+      hybridPrincipal.clearLayers();
+      markerMap.clear();
+    },
+
+    getAllMarkers: () => Array.from(markerMap.values()).map(item => item.marker),
+
+    /**
+     * Retorna o objeto marker correspondente a um stationCode específico.
+     */
+    getMarkerByCode: (code) => markerMap.get(String(code))?.marker,
+
+    /**
+     * Define se a estação deve ter alerta de chuva e atualiza o ícone.
+     * @param {string|number} stationCode - Código da estação
+     * @param {boolean} isAlert - true para ativar o piscar, false para desativar
+     */
+    setHighRainAlert: (stationCode, isAlert) => {
+      const entry = markerMap.get(String(stationCode));
+      if (!entry) return;
+      const { marker } = entry;
+      marker.stationData.highRainAlert = isAlert;
+      marker.updateIcon();
+    },
+
+    getLayer: () => hybridPrincipal,
+    enableCluster,
+    disableCluster,
+    createClusterIcon
   };
 })();

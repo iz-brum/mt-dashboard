@@ -7,8 +7,8 @@
  * @module HourlyRainfall
  */
 
-import { showError } from '../../utils/notificacoes.js';        // Importa a função para exibir mensagens de erro na interface
-import { formatTimestamp } from '../../utils/formatoData.js';    // Importa a função para formatar os timestamps
+import { showError } from '#utils/notificacoes.js';        // Importa a função para exibir mensagens de erro na interface
+import { formatTimestamp } from '#utils/formatoData.js';    // Importa a função para formatar os timestamps
 import { fetchTimestamps } from '../../../server/apis/hydro_estimator_rainfall/services/apiManager.js';                   // Importa a função para buscar os timestamps da API
 import { createAnimationManager } from './animationManager.js';      // Importa o gerenciador de animação para os overlays
 import { scheduleRefresh } from './refreshScheduler.js';             // Importa a função para agendar a atualização dos timestamps

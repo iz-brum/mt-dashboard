@@ -46,7 +46,7 @@ class StationDataFetcher:
         self.brasilia_tz = brasilia_tz
         # OBSERVAÇÃO: A data de busca será atualizada a cada execução para refletir a data atual.
         # self.intervalo_busca = "HORA_12"  # Exemplo de intervalo de busca (pode indicar 12 horas)
-        self.intervalo_busca = "HORA_12"  # Exemplo de intervalo de busca (pode indicar 12 horas)
+        self.intervalo_busca = "HORA_24"  # Exemplo de intervalo de busca (pode indicar 24 horas)
         self.max_workers = 12             # Número máximo de threads paralelas para a busca de dados
 
     def update_data_busca(self):

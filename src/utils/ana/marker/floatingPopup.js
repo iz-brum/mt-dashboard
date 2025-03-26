@@ -1,20 +1,21 @@
 /**
- * Anexa os eventos de mouse para exibir e atualizar os quadros flutuantes (floating popup boxes)
- * para um marcador fornecido.
- * Essa função cria os boxes se ainda não existirem para esse marcador e configura os eventos de
- * mouseover e mouseout.
- *
- * @param {Object} marker - Marcador do Leaflet que deve exibir os quadros.
- * @param {Object} DEFAULT_CONFIG - Configurações padrão.
+ * @file src/utils/ana/marker/floatingPopup.js
  */
-export function attachFloatingPopupEvents(marker, DEFAULT_CONFIG) {
+import { FLOATING_POPUP_CONFIG } from '#utils/config.js';
 
-  // Remove popups existentes ANTES de criar novos
+export function attachFloatingPopupEvents(marker, DEFAULT_CONFIG) {
+  // Se os popups já estiverem anexados, não recrie-os
+  if (marker._floatingPopupAttached) {
+    return;
+  }
+  marker._floatingPopupAttached = true;
+
+  // Se houver popups antigos, remova-os (garante que não há duplicação)
   if (marker._cotaBox) marker._cotaBox.remove();
   if (marker._vazaoBox) marker._vazaoBox.remove();
   if (marker._chuvaBox) marker._chuvaBox.remove();
 
-  // Cria os boxes PRIMEIRO
+  // Cria os elementos apenas uma vez
   const cotaBox = document.createElement('div');
   cotaBox.classList.add('floating-info-box', 'floating-cota');
 
@@ -24,104 +25,83 @@ export function attachFloatingPopupEvents(marker, DEFAULT_CONFIG) {
   const chuvaBox = document.createElement('div');
   chuvaBox.classList.add('floating-info-box', 'floating-chuva');
 
-  // DEPOIS armazene as referências nos marcadores
+  // Armazena-os no marcador para reutilização
   marker._cotaBox = cotaBox;
   marker._vazaoBox = vazaoBox;
   marker._chuvaBox = chuvaBox;
 
-  if (!marker._map) {
-    marker.once('add', () => {
-      attachFloatingPopupEvents(marker, DEFAULT_CONFIG);
-    });
-    return;
-  }
-
-  // Cria os boxes e os anexa ao contêiner do mapa
+  // Anexa os elementos ao container do mapa
   const mapContainer = marker._map.getContainer();
-
   mapContainer.appendChild(cotaBox);
   mapContainer.appendChild(vazaoBox);
   mapContainer.appendChild(chuvaBox);
 
-  let updateTimer = null; // Timer para atualização periódica
+  let updateTimer = null;
+  let hideTimer = null;
+  let isHovering = false;
 
-  // Função para atualizar o conteúdo dos boxes
   function updateBoxes() {
     cotaBox.innerHTML = `
-        <span class="floating-label">Cota</span>
-        <span class="floating-value">${(marker.stationData.nivelMaisRecente !== DEFAULT_CONFIG.INVALID_VALUE && marker.stationData.nivelMaisRecente !== null)
+        <span class="floating-label">${FLOATING_POPUP_CONFIG.labels.level}</span>
+        <span class="floating-value">${(marker.stationData.nivelMaisRecente !== DEFAULT_CONFIG.INVALID_VALUE &&
+        marker.stationData.nivelMaisRecente !== null)
         ? marker.stationData.nivelMaisRecente
         : 'N/A'
       }</span>
-        <span class="floating-unit">m</span>
+        <span class="floating-unit">${FLOATING_POPUP_CONFIG.units.level}</span>
       `;
 
     vazaoBox.innerHTML = `
-        <span class="floating-label">Vazão</span>
-        <span class="floating-value">${(marker.stationData.vazaoMaisRecente !== DEFAULT_CONFIG.INVALID_VALUE && marker.stationData.vazaoMaisRecente !== null)
+        <span class="floating-label">${FLOATING_POPUP_CONFIG.labels.discharge}</span>
+        <span class="floating-value">${(marker.stationData.vazaoMaisRecente !== DEFAULT_CONFIG.INVALID_VALUE &&
+        marker.stationData.vazaoMaisRecente !== null)
         ? marker.stationData.vazaoMaisRecente
         : 'N/A'
       }</span>
-        <span class="floating-unit">m³/s</span>
+        <span class="floating-unit">${FLOATING_POPUP_CONFIG.units.discharge}</span>
       `;
 
     chuvaBox.innerHTML = `
-        <span class="floating-label">Chuva</span>
+        <span class="floating-label">${FLOATING_POPUP_CONFIG.labels.rainfall}</span>
         <span class="floating-value">${typeof marker.stationData.chuvaAcumulada === 'number'
         ? marker.stationData.chuvaAcumulada.toFixed(2)
         : 'N/A'
       }</span>
-        <span class="floating-unit">mm</span>
+        <span class="floating-unit">${FLOATING_POPUP_CONFIG.units.rainfall}</span>
       `;
   }
 
-  // Função para atualizar a posição dos boxes
   function updatePosition() {
     if (!marker._map) return;
-
-    // Coordenadas do marcador *em relação ao contêiner do mapa*
     const markerPos = marker._map.latLngToContainerPoint(marker.getLatLng());
-
-    // Posição absoluta do contêiner do mapa na página
     const mapRect = marker._map.getContainer().getBoundingClientRect();
 
-    // Ajuste final (exemplo para cotaBox):
-    cotaBox.style.left = `${mapRect.left + markerPos.x - 85}px`;
-    cotaBox.style.top = `${mapRect.top + markerPos.y - 10}px`;
+    cotaBox.style.left = `${mapRect.left + markerPos.x + FLOATING_POPUP_CONFIG.positionOffsets.level.left}px`;
+    cotaBox.style.top = `${mapRect.top + markerPos.y + FLOATING_POPUP_CONFIG.positionOffsets.level.top}px`;
 
-    // Repita para vazaoBox e chuvaBox:
-    vazaoBox.style.left = `${mapRect.left + markerPos.x - 50}px`;
-    vazaoBox.style.top = `${mapRect.top + markerPos.y + 50}px`;
+    vazaoBox.style.left = `${mapRect.left + markerPos.x + FLOATING_POPUP_CONFIG.positionOffsets.discharge.left}px`;
+    vazaoBox.style.top = `${mapRect.top + markerPos.y + FLOATING_POPUP_CONFIG.positionOffsets.discharge.top}px`;
 
-    chuvaBox.style.left = `${mapRect.left + markerPos.x + 47}px`;
-    chuvaBox.style.top = `${mapRect.top + markerPos.y - 10}px`;
+    chuvaBox.style.left = `${mapRect.left + markerPos.x + FLOATING_POPUP_CONFIG.positionOffsets.rainfall.left}px`;
+    chuvaBox.style.top = `${mapRect.top + markerPos.y + FLOATING_POPUP_CONFIG.positionOffsets.rainfall.top}px`;
   }
 
-  marker.on('add', () => {
-    marker._map.on('resize fullscreenchange', updatePosition);
-  });
-
-  marker.on('remove', () => {
-    marker._map.off('resize fullscreenchange', updatePosition);
-  });
-
-  // Configura os eventos de mouse
-  marker.on('mouseover', () => {
-    console.log('[DEBUG] Mouseover no marcador:', marker.stationData.codigoestacao); // Adicione esta linha
-
+  function showBoxes() {
     updateBoxes();
+    updatePosition();
     cotaBox.style.display = 'flex';
     vazaoBox.style.display = 'flex';
     chuvaBox.style.display = 'flex';
-    updatePosition();
-    updateTimer = setInterval(() => {
-      updateBoxes();
-      updatePosition();
-      console.log("Atualizando quadros telemétricos para", marker.stationData.codigoestacao);
-    }, 5000);
-  });
+    // Se já existe um timer, não cria outro
+    if (!updateTimer) {
+      updateTimer = setInterval(() => {
+        updateBoxes();
+        updatePosition();
+      }, FLOATING_POPUP_CONFIG.updateInterval);
+    }
+  }
 
-  marker.on('mouseout', () => {
+  function hideBoxes() {
     cotaBox.style.display = 'none';
     vazaoBox.style.display = 'none';
     chuvaBox.style.display = 'none';
@@ -129,9 +109,69 @@ export function attachFloatingPopupEvents(marker, DEFAULT_CONFIG) {
       clearInterval(updateTimer);
       updateTimer = null;
     }
+  }
+
+  function clearHideTimer() {
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
+  }
+
+  function delayedHideCheck() {
+    clearHideTimer();
+    hideTimer = setTimeout(() => {
+      if (!isHovering) {
+        hideBoxes();
+      }
+    }, 150);
+  }
+
+  function setupHoverListeners(element) {
+    if (!element || element.__floatingPopupBound) return;
+    element.__floatingPopupBound = true;
+
+    element.addEventListener('mouseenter', () => {
+      isHovering = true;
+      clearHideTimer();
+      showBoxes();
+    });
+
+    element.addEventListener('mouseleave', () => {
+      isHovering = false;
+      delayedHideCheck();
+    });
+  }
+
+  // Listener de resize e fullscreen
+  marker._map.on('resize fullscreenchange', updatePosition);
+
+  // Attach listeners ao marcador se o _icon já estiver definido
+  if (marker._icon) {
+    setupHoverListeners(marker._icon);
+  } else {
+    marker.once('add', () => {
+      setTimeout(() => {
+        if (marker._icon) {
+          setupHoverListeners(marker._icon);
+        }
+      }, 0);
+    });
+  }
+
+  // Attach listeners aos boxes para garantir que o hover funcione
+  setupHoverListeners(cotaBox);
+  setupHoverListeners(vazaoBox);
+  setupHoverListeners(chuvaBox);
+
+  // Ao remover o marcador, limpa tudo e reseta a flag
+  marker.on('remove', () => {
+    hideBoxes();
+    marker._map.off('resize fullscreenchange', updatePosition);
+    marker._floatingPopupAttached = false;
   });
 
-  // Se necessário, permita atualização manual
+  // Permite atualização manual dos dados
   marker.updateFloatingData = () => {
     updateBoxes();
   };
